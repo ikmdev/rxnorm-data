@@ -40,10 +40,10 @@
                 <configuration>
                     <dataStore>${dataStoreLocation}/${dataStore}</dataStore>
                     <fileset>
-                        <directory>${project.basedir}</directory>
-        			    <includes>
- 		            		<include>**/*.zip</include>
-			            </includes>
+                        <directory>${starterSetLocation}</directory>
+                        <includes>
+                            <include>**/${starterSet}</include>
+                        </includes>
                     </fileset>
                 </configuration>
                 <executions>
