@@ -5,12 +5,15 @@ import dev.ikm.maven.RxnormUtility;
 import dev.ikm.tinkar.common.id.PublicIds;
 import dev.ikm.tinkar.common.util.uuid.UuidT5Generator;
 import dev.ikm.tinkar.common.util.uuid.UuidUtil;
+import dev.ikm.tinkar.component.Component;
 import dev.ikm.tinkar.coordinate.Calculators;
+import dev.ikm.tinkar.coordinate.Coordinates;
 import dev.ikm.tinkar.coordinate.stamp.StampCoordinateRecord;
 import dev.ikm.tinkar.coordinate.stamp.StampPositionRecord;
 import dev.ikm.tinkar.coordinate.stamp.StateSet;
 import dev.ikm.tinkar.coordinate.stamp.calculator.Latest;
 import dev.ikm.tinkar.coordinate.stamp.calculator.StampCalculator;
+import dev.ikm.tinkar.coordinate.stamp.calculator.StampCalculatorWithCache;
 import dev.ikm.tinkar.entity.ConceptRecord;
 import dev.ikm.tinkar.entity.ConceptVersionRecord;
 import dev.ikm.tinkar.entity.EntityService;
@@ -28,6 +31,7 @@ import java.util.Date;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -39,7 +43,7 @@ public class RxnormIdentifierSemanticIT extends AbstractIntegrationTest {
      * @result Reads content from file and validates Identifier Semantics by calling private method assertConcept().
      */
     @Test
-    public void testRxnormConceptSemantics() throws IOException {
+    public void testRxnormIdentifierSemantics() throws IOException {
         String sourceFilePath = "../rxnorm-origin/";
         String errorFile = "target/failsafe-reports/Rxnorm_Identifier_not_found.txt";
         String absolutePath = findFilePath(sourceFilePath, rxnormOwlFileName);  //findFilePath(sourceFilePath, rxnormOwlFileName);
@@ -62,7 +66,6 @@ public class RxnormIdentifierSemanticIT extends AbstractIntegrationTest {
            
         StateSet state = StateSet.ACTIVE;
         StampPositionRecord stampPosition = StampPositionRecord.make(timeForStamp, TinkarTerm.DEVELOPMENT_PATH.nid());
-        StampCalculator stampCalc = StampCoordinateRecord.make(state, stampPosition).stampCalculator();
         
         UUID snomedIdentifierUuid = UUID.fromString(RxnormUtility.SNOMED_IDENTIFIER_PUBLIC_ID);
         EntityProxy.Concept ndcIdentifierConcept = RxnormUtility.getNdcIdentifierConcept();
@@ -74,20 +77,28 @@ public class RxnormIdentifierSemanticIT extends AbstractIntegrationTest {
         // EntityProxy.Concept snomedIdentifierConcept = RxnormUtility.getSnomedIdentifierConcept();
         // Generate UUID based on RxNorm ID
 		
+		AtomicInteger innerCount = new AtomicInteger(0);
 		EntityProxy.Concept concept;
 		AtomicBoolean snomedExists = new AtomicBoolean(true);
 		if(rxnormId != null) {
+	        // StampCalculator stampCalc = StampCoordinateRecord.make(state, stampPosition).stampCalculator();
+	        StampCalculator stampCalc = StampCalculatorWithCache
+	                .getCalculator(StampCoordinateRecord.make(state, Coordinates.Position.LatestOnDevelopment()));
+			
 			concept = EntityProxy.Concept.make(PublicIds.of(uuid(rxnormId)));
 			
-			//concept = EntityProxy.Concept.make(PublicIds.of(UUID.fromString(namespaceString)));
-			
-			EntityProxy.Concept snomedIdentifier = RxnormUtility.getSnomedIdentifierConcept();
 	        EntityService.get().forEachSemanticForComponentOfPattern(concept.nid(), TinkarTerm.IDENTIFIER_PATTERN.nid(), semanticEntity -> {
 	        	Latest<SemanticEntityVersion> latest = stampCalc.latest(semanticEntity);
 	        	
 	        	if (!latest.isPresent()) {
-	        		snomedExists.set(false);
-	        		// String text = latestDescriptionPattern.getFieldWithMeaning(TinkarTerm.TEXT_FOR_DESCRIPTION, latest.get());
+	        		if (!rxnormData.getSnomedCtId().isEmpty()) {
+	        			innerCount.addAndGet(1);
+                        Component component = latestIdentifierPattern.getFieldWithMeaning(TinkarTerm.IDENTIFIER_SOURCE, latest.get());
+                        String value = latestIdentifierPattern.getFieldWithMeaning(TinkarTerm.IDENTIFIER_VALUE, latest.get());
+                        if (!rxnormData.getSnomedCtId().equals(value) || !RxnormUtility.getSnomedIdentifierConcept().equals(component)) {
+                            snomedExists.set(false);
+                        }
+                    }
 	        	} else {
 	        		snomedExists.set(true);
 	        	}
