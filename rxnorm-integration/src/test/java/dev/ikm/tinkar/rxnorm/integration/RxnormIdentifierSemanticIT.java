@@ -115,35 +115,34 @@ public class RxnormIdentifierSemanticIT extends AbstractIntegrationTest {
 	        	
 	        	if (latestActive.isPresent()) {
 	        		if (!rxnormData.getSnomedCtId().isEmpty()) {
-	        			innerCount.addAndGet(1);
                         Component component = latestIdentifierPattern.getFieldWithMeaning(TinkarTerm.IDENTIFIER_SOURCE, latestActive.get());
                         String value = latestIdentifierPattern.getFieldWithMeaning(TinkarTerm.IDENTIFIER_VALUE, latestActive.get());
                         if (rxnormData.getSnomedCtId().equals(value) && RxnormUtility.getSnomedIdentifierConcept().equals(component)) {
                             latestExists.set(true);
+                            innerCount.addAndGet(1);
                         }
                     }
 	        		
 	        		if(!rxnormData.getRxCuiId().isEmpty()){
-	        			innerCount.addAndGet(1);
                         Component component = latestIdentifierPattern.getFieldWithMeaning(TinkarTerm.IDENTIFIER_SOURCE, latestActive.get());
                         String value = latestIdentifierPattern.getFieldWithMeaning(TinkarTerm.IDENTIFIER_VALUE, latestActive.get());
                         if (rxnormData.getRxCuiId().equals(value) && RxnormUtility.getRxcuidConcept().equals(component)) {
                             latestExists.set(true);
+                            innerCount.addAndGet(1);
                         }
                     }
 	        		
 	        		if(!rxnormData.getRxCuiId().isEmpty()){
-	        			innerCount.addAndGet(1);
                         Component component = latestIdentifierPattern.getFieldWithMeaning(TinkarTerm.IDENTIFIER_SOURCE, latestActive.get());
                         String value = latestIdentifierPattern.getFieldWithMeaning(TinkarTerm.IDENTIFIER_VALUE, latestActive.get());
                         if (rxnormData.getVuidId().equals(value) && RxnormUtility.getVuidConcept().equals(component)) {
                             latestExists.set(true);
+                            innerCount.addAndGet(1);
                         }
                     }
 	        		
 	        		 if(!rxnormData.getNdcCodesWithEndDates().isEmpty()){
 	        			for (Map.Entry<String, String> entry : rxnormData.getNdcCodesWithEndDates().entrySet()) {
-	        				innerCount.addAndGet(1);
 	        				
 	                        String ndcCode = entry.getKey();
 	                        String endDate = entry.getValue();
@@ -152,6 +151,7 @@ public class RxnormIdentifierSemanticIT extends AbstractIntegrationTest {
 	                        String value = latestIdentifierPattern.getFieldWithMeaning(TinkarTerm.IDENTIFIER_VALUE, latestActive.get());
 	                        if (ndcCode.equals(value) && RxnormUtility.getNdcIdentifierConcept().equals(component)) {
 	                            latestExists.set(true);
+	                            innerCount.addAndGet(1);
 	                        }
 	        			}       			
                    }
@@ -160,7 +160,6 @@ public class RxnormIdentifierSemanticIT extends AbstractIntegrationTest {
 	        	if (latestInActive.isPresent()) {
 	        		 if(!rxnormData.getNdcCodesWithEndDates().isEmpty()) {
 	        			for (Map.Entry<String, String> entry : rxnormData.getNdcCodesWithEndDates().entrySet()) {
-	        				innerCount.addAndGet(1);
 	        				
 	                        String ndcCode = entry.getKey();
 	                        String endDate = entry.getValue();
@@ -169,6 +168,7 @@ public class RxnormIdentifierSemanticIT extends AbstractIntegrationTest {
 	                        String value = latestIdentifierPattern.getFieldWithMeaning(TinkarTerm.IDENTIFIER_VALUE, latestInActive.get());
 	                        if (ndcCode.equals(value) && RxnormUtility.getNdcIdentifierConcept().equals(component)) {
 	                            latestExists.set(true);
+	                            innerCount.addAndGet(1);
 	                        }
 	        			}       			
                     }   
