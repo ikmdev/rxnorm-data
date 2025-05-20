@@ -35,21 +35,21 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class RxnormIdentifierSemanticIT extends AbstractIntegrationTest {
+public class RxnormPatternSemanticIT extends AbstractIntegrationTest {
 
     /**
      * Test RxnormConcepts Semantics.
      *
-     * @result Reads content from file and validates Identifier Semantics by calling private method assertConcept().
+     * @result Reads content from file and validates Pattern Semantics by calling private method assertConcept().
      */
     @Test
-    public void testRxnormIdentifierSemantics() throws IOException {
+    public void testRxnormPatternSemantics() throws IOException {
         String sourceFilePath = "../rxnorm-origin/";
-        String errorFile = "target/failsafe-reports/Rxnorm_Identifier_not_found.txt";
+        String errorFile = "target/failsafe-reports/Rxnorm_Pattern_not_found.txt";
         String absolutePath = rxnormOwlFileName; 
         int notFound = processOwlFile(absolutePath, errorFile);
 
-        assertEquals(0, notFound, "Unable to find " + notFound + " Rxnorm Identifier semantics. Details written to " + errorFile);
+        assertEquals(0, notFound, "Unable to find " + notFound + " Rxnorm Pattern semantics. Details written to " + errorFile);
     }
 
     @Override
@@ -84,6 +84,8 @@ public class RxnormIdentifierSemanticIT extends AbstractIntegrationTest {
 		AtomicBoolean latestExists = new AtomicBoolean(false);
 		
 		if(rxnormId != null) {
+			//StampPositionRecord stampPosition = StampPositionRecord.make(timeForStamp, TinkarTerm.DEVELOPMENT_PATH.nid());
+	        //StampCalculator stampCalc = StampCoordinateRecord.make(state, stampPosition).stampCalculator();
 	        StampCalculator stampCalcActive = StampCalculatorWithCache
 	               .getCalculator(StampCoordinateRecord.make(stateActive, Coordinates.Position.LatestOnDevelopment()));
 
@@ -115,7 +117,7 @@ public class RxnormIdentifierSemanticIT extends AbstractIntegrationTest {
                         }
                     }
 	        		
-	        		if(!rxnormData.getVuidId().isEmpty()){
+	        		if(!rxnormData.getRxCuiId().isEmpty()){
                         Component component = latestIdentifierPattern.getFieldWithMeaning(TinkarTerm.IDENTIFIER_SOURCE, latestActive.get());
                         String value = latestIdentifierPattern.getFieldWithMeaning(TinkarTerm.IDENTIFIER_VALUE, latestActive.get());
                         if (rxnormData.getVuidId().equals(value) && RxnormUtility.getVuidConcept().equals(component)) {
@@ -128,6 +130,7 @@ public class RxnormIdentifierSemanticIT extends AbstractIntegrationTest {
 	        			for (Map.Entry<String, String> entry : rxnormData.getNdcCodesWithEndDates().entrySet()) {
 	        				
 	                        String ndcCode = entry.getKey();
+	                        String endDate = entry.getValue();
 	                        
 	                        Component component = latestIdentifierPattern.getFieldWithMeaning(TinkarTerm.IDENTIFIER_SOURCE, latestActive.get());
 	                        String value = latestIdentifierPattern.getFieldWithMeaning(TinkarTerm.IDENTIFIER_VALUE, latestActive.get());
@@ -144,6 +147,7 @@ public class RxnormIdentifierSemanticIT extends AbstractIntegrationTest {
 	        			for (Map.Entry<String, String> entry : rxnormData.getNdcCodesWithEndDates().entrySet()) {
 	        				
 	                        String ndcCode = entry.getKey();
+	                        String endDate = entry.getValue();
 	                        
 	                        Component component = latestIdentifierPattern.getFieldWithMeaning(TinkarTerm.IDENTIFIER_SOURCE, latestInActive.get());
 	                        String value = latestIdentifierPattern.getFieldWithMeaning(TinkarTerm.IDENTIFIER_VALUE, latestInActive.get());
