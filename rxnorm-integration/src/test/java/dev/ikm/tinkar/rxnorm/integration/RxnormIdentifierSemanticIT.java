@@ -46,7 +46,7 @@ public class RxnormIdentifierSemanticIT extends AbstractIntegrationTest {
     public void testRxnormIdentifierSemantics() throws IOException {
         String sourceFilePath = "../rxnorm-origin/";
         String errorFile = "target/failsafe-reports/Rxnorm_Identifier_not_found.txt";
-        String absolutePath = findFilePath(sourceFilePath, rxnormOwlFileName);  //findFilePath(sourceFilePath, rxnormOwlFileName);
+        String absolutePath = rxnormOwlFileName; //findFilePath(sourceFilePath, rxnormOwlFileName);  //findFilePath(sourceFilePath, rxnormOwlFileName);
         int notFound = processOwlFile(absolutePath, errorFile);
 
         assertEquals(0, notFound, "Unable to find " + notFound + " Rxnorm Identifier semantics. Details written to " + errorFile);
@@ -58,16 +58,34 @@ public class RxnormIdentifierSemanticIT extends AbstractIntegrationTest {
         String snomedctId = rxnormData.getSnomedCtId();
         String rxCuid = rxnormData.getRxCuiId();
         String vuidCuid = rxnormData.getVuidId();
+
+        int count = 0;
+        AtomicInteger innerCount = new AtomicInteger(0);
+        
+        if (!rxnormData.getSnomedCtId().isEmpty()) {
+            count++;
+        }
+        if (!rxnormData.getRxCuiId().isEmpty()) {
+            count++;
+        }
+        if (!rxnormData.getVuidId().isEmpty()) {
+            count++;
+        }
+        if(!rxnormData.getNdcCodesWithEndDates().isEmpty()){
+			 for (Map.Entry<String, String> entry : rxnormData.getNdcCodesWithEndDates().entrySet()) {
+		          count++;
+			 }
+        }
+        
         
         // Generate UUID based on RxNorm Snomed IDENTIFIER
         // UUID conceptUuid = UuidT5Generator.get(uuid(namespaceString), rxnormId);
         // EntityProxy.Concept concept = EntityProxy.Concept.make(PublicIds.of(conceptUuid));
         // UUID snomedIdentifierUuid = UuidT5Generator.get(uuid(namespaceString), concept.publicId().asUuidArray()[0] + rxnormData.getSnomedCtId() + "ID");
            
-        StateSet state = StateSet.ACTIVE;
-        StampPositionRecord stampPosition = StampPositionRecord.make(timeForStamp, TinkarTerm.DEVELOPMENT_PATH.nid());
+        StateSet stateActive = StateSet.ACTIVE;
+        StateSet stateInActive = StateSet.INACTIVE;
         
-        UUID snomedIdentifierUuid = UUID.fromString(RxnormUtility.SNOMED_IDENTIFIER_PUBLIC_ID);
         EntityProxy.Concept ndcIdentifierConcept = RxnormUtility.getNdcIdentifierConcept();
         UUID ndcIdentifierUuid = UUID.fromString(RxnormUtility.NDC_IDENTIFIER_PUBLIC_ID);
         
@@ -77,35 +95,91 @@ public class RxnormIdentifierSemanticIT extends AbstractIntegrationTest {
         // EntityProxy.Concept snomedIdentifierConcept = RxnormUtility.getSnomedIdentifierConcept();
         // Generate UUID based on RxNorm ID
 		
-		AtomicInteger innerCount = new AtomicInteger(0);
 		EntityProxy.Concept concept;
-		AtomicBoolean snomedExists = new AtomicBoolean(true);
+		AtomicBoolean latestExists = new AtomicBoolean(false);
+		
 		if(rxnormId != null) {
-	        // StampCalculator stampCalc = StampCoordinateRecord.make(state, stampPosition).stampCalculator();
-	        StampCalculator stampCalc = StampCalculatorWithCache
-	                .getCalculator(StampCoordinateRecord.make(state, Coordinates.Position.LatestOnDevelopment()));
-			
+			//StampPositionRecord stampPosition = StampPositionRecord.make(timeForStamp, TinkarTerm.DEVELOPMENT_PATH.nid());
+	        //StampCalculator stampCalc = StampCoordinateRecord.make(state, stampPosition).stampCalculator();
+	        StampCalculator stampCalcActive = StampCalculatorWithCache
+	               .getCalculator(StampCoordinateRecord.make(stateActive, Coordinates.Position.LatestOnDevelopment()));
+
+	        StampCalculator stampCalcInActive = StampCalculatorWithCache
+		               .getCalculator(StampCoordinateRecord.make(stateInActive, Coordinates.Position.LatestOnDevelopment()));
+	        
 			concept = EntityProxy.Concept.make(PublicIds.of(uuid(rxnormId)));
 			
 	        EntityService.get().forEachSemanticForComponentOfPattern(concept.nid(), TinkarTerm.IDENTIFIER_PATTERN.nid(), semanticEntity -> {
-	        	Latest<SemanticEntityVersion> latest = stampCalc.latest(semanticEntity);
+	        	Latest<SemanticEntityVersion> latestActive = stampCalcActive.latest(semanticEntity);
+	        	Latest<SemanticEntityVersion> latestInActive = stampCalcInActive.latest(semanticEntity);
 	        	
-	        	if (!latest.isPresent()) {
+	        	if (latestActive.isPresent()) {
 	        		if (!rxnormData.getSnomedCtId().isEmpty()) {
 	        			innerCount.addAndGet(1);
-                        Component component = latestIdentifierPattern.getFieldWithMeaning(TinkarTerm.IDENTIFIER_SOURCE, latest.get());
-                        String value = latestIdentifierPattern.getFieldWithMeaning(TinkarTerm.IDENTIFIER_VALUE, latest.get());
-                        if (!rxnormData.getSnomedCtId().equals(value) || !RxnormUtility.getSnomedIdentifierConcept().equals(component)) {
-                            snomedExists.set(false);
+                        Component component = latestIdentifierPattern.getFieldWithMeaning(TinkarTerm.IDENTIFIER_SOURCE, latestActive.get());
+                        String value = latestIdentifierPattern.getFieldWithMeaning(TinkarTerm.IDENTIFIER_VALUE, latestActive.get());
+                        if (rxnormData.getSnomedCtId().equals(value) && RxnormUtility.getSnomedIdentifierConcept().equals(component)) {
+                            latestExists.set(true);
                         }
                     }
-	        	} else {
-	        		snomedExists.set(true);
-	        	}
+	        		
+	        		if(!rxnormData.getRxCuiId().isEmpty()){
+	        			innerCount.addAndGet(1);
+                        Component component = latestIdentifierPattern.getFieldWithMeaning(TinkarTerm.IDENTIFIER_SOURCE, latestActive.get());
+                        String value = latestIdentifierPattern.getFieldWithMeaning(TinkarTerm.IDENTIFIER_VALUE, latestActive.get());
+                        if (rxnormData.getRxCuiId().equals(value) && RxnormUtility.getRxcuidConcept().equals(component)) {
+                            latestExists.set(true);
+                        }
+                    }
+	        		
+	        		if(!rxnormData.getRxCuiId().isEmpty()){
+	        			innerCount.addAndGet(1);
+                        Component component = latestIdentifierPattern.getFieldWithMeaning(TinkarTerm.IDENTIFIER_SOURCE, latestActive.get());
+                        String value = latestIdentifierPattern.getFieldWithMeaning(TinkarTerm.IDENTIFIER_VALUE, latestActive.get());
+                        if (rxnormData.getVuidId().equals(value) && RxnormUtility.getVuidConcept().equals(component)) {
+                            latestExists.set(true);
+                        }
+                    }
+	        		
+	        		 if(!rxnormData.getNdcCodesWithEndDates().isEmpty()){
+	        			for (Map.Entry<String, String> entry : rxnormData.getNdcCodesWithEndDates().entrySet()) {
+	        				innerCount.addAndGet(1);
+	        				
+	                        String ndcCode = entry.getKey();
+	                        String endDate = entry.getValue();
+	                        
+	                        Component component = latestIdentifierPattern.getFieldWithMeaning(TinkarTerm.IDENTIFIER_SOURCE, latestActive.get());
+	                        String value = latestIdentifierPattern.getFieldWithMeaning(TinkarTerm.IDENTIFIER_VALUE, latestActive.get());
+	                        if (ndcCode.equals(value) && RxnormUtility.getNdcIdentifierConcept().equals(component)) {
+	                            latestExists.set(true);
+	                        }
+	        			}       			
+                   }
+	        	} 
+	        	
+	        	if (latestInActive.isPresent()) {
+	        		 if(!rxnormData.getNdcCodesWithEndDates().isEmpty()) {
+	        			for (Map.Entry<String, String> entry : rxnormData.getNdcCodesWithEndDates().entrySet()) {
+	        				innerCount.addAndGet(1);
+	        				
+	                        String ndcCode = entry.getKey();
+	                        String endDate = entry.getValue();
+	                        
+	                        Component component = latestIdentifierPattern.getFieldWithMeaning(TinkarTerm.IDENTIFIER_SOURCE, latestInActive.get());
+	                        String value = latestIdentifierPattern.getFieldWithMeaning(TinkarTerm.IDENTIFIER_VALUE, latestInActive.get());
+	                        if (ndcCode.equals(value) && RxnormUtility.getNdcIdentifierConcept().equals(component)) {
+	                            latestExists.set(true);
+	                        }
+	        			}       			
+                    }   
+	        	} 
 	        });    
 	     		      
 		}
 		
-        return snomedExists.get();  
+		System.out.println("Count : " + count);
+		System.out.println("innerCount : " + innerCount + "\n");
+		
+        return latestExists.get() && count == innerCount.get();  
     }    
 }
