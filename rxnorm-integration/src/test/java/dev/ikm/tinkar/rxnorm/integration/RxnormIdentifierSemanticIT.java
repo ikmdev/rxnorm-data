@@ -46,7 +46,7 @@ public class RxnormIdentifierSemanticIT extends AbstractIntegrationTest {
     public void testRxnormIdentifierSemantics() throws IOException {
         String sourceFilePath = "../rxnorm-origin/";
         String errorFile = "target/failsafe-reports/Rxnorm_Identifier_not_found.txt";
-        String absolutePath = rxnormOwlFileName; //findFilePath(sourceFilePath, rxnormOwlFileName);  //findFilePath(sourceFilePath, rxnormOwlFileName);
+        String absolutePath = rxnormOwlFileName; 
         int notFound = processOwlFile(absolutePath, errorFile);
 
         assertEquals(0, notFound, "Unable to find " + notFound + " Rxnorm Identifier semantics. Details written to " + errorFile);
@@ -55,9 +55,6 @@ public class RxnormIdentifierSemanticIT extends AbstractIntegrationTest {
     @Override
     protected boolean assertOwlElement(RxnormData rxnormData) {
         String rxnormId = rxnormData.getId();
-        String snomedctId = rxnormData.getSnomedCtId();
-        String rxCuid = rxnormData.getRxCuiId();
-        String vuidCuid = rxnormData.getVuidId();
 
         int count = 0;
         AtomicInteger innerCount = new AtomicInteger(0);
@@ -76,24 +73,12 @@ public class RxnormIdentifierSemanticIT extends AbstractIntegrationTest {
 		          count++;
 			 }
         }
-        
-        
-        // Generate UUID based on RxNorm Snomed IDENTIFIER
-        // UUID conceptUuid = UuidT5Generator.get(uuid(namespaceString), rxnormId);
-        // EntityProxy.Concept concept = EntityProxy.Concept.make(PublicIds.of(conceptUuid));
-        // UUID snomedIdentifierUuid = UuidT5Generator.get(uuid(namespaceString), concept.publicId().asUuidArray()[0] + rxnormData.getSnomedCtId() + "ID");
            
         StateSet stateActive = StateSet.ACTIVE;
         StateSet stateInActive = StateSet.INACTIVE;
         
-        EntityProxy.Concept ndcIdentifierConcept = RxnormUtility.getNdcIdentifierConcept();
-        UUID ndcIdentifierUuid = UUID.fromString(RxnormUtility.NDC_IDENTIFIER_PUBLIC_ID);
-        
 		PatternEntityVersion latestIdentifierPattern = (PatternEntityVersion) Calculators.Stamp.DevelopmentLatest()
 				.latest(TinkarTerm.IDENTIFIER_PATTERN).get();
-        
-        // EntityProxy.Concept snomedIdentifierConcept = RxnormUtility.getSnomedIdentifierConcept();
-        // Generate UUID based on RxNorm ID
 		
 		EntityProxy.Concept concept;
 		AtomicBoolean latestExists = new AtomicBoolean(false);
