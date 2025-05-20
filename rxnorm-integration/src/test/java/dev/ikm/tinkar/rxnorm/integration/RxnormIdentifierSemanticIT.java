@@ -158,9 +158,6 @@ public class RxnormIdentifierSemanticIT extends AbstractIntegrationTest {
 	     		      
 		}
 		
-		System.out.println("Count : " + count);
-		System.out.println("innerCount : " + innerCount + "\n");
-		
 		if(count == 0) {
 			latestExists.set(true);
 		}
