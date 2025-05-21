@@ -80,7 +80,6 @@ public class RxnormIdentifierSemanticIT extends AbstractIntegrationTest {
 				.latest(TinkarTerm.IDENTIFIER_PATTERN).get();
 		
 		EntityProxy.Concept concept;
-		AtomicBoolean latestExists = new AtomicBoolean(false);
 		
 		if(rxnormId != null) {
 	        StampCalculator stampCalcActive = StampCalculatorWithCache
@@ -100,7 +99,6 @@ public class RxnormIdentifierSemanticIT extends AbstractIntegrationTest {
                         Component component = latestIdentifierPattern.getFieldWithMeaning(TinkarTerm.IDENTIFIER_SOURCE, latestActive.get());
                         String value = latestIdentifierPattern.getFieldWithMeaning(TinkarTerm.IDENTIFIER_VALUE, latestActive.get());
                         if (rxnormData.getSnomedCtId().equals(value) && RxnormUtility.getSnomedIdentifierConcept().equals(component)) {
-                            latestExists.set(false);
                             innerSnomedCount.addAndGet(1);
                         }
                     }
@@ -109,7 +107,6 @@ public class RxnormIdentifierSemanticIT extends AbstractIntegrationTest {
                         Component component = latestIdentifierPattern.getFieldWithMeaning(TinkarTerm.IDENTIFIER_SOURCE, latestActive.get());
                         String value = latestIdentifierPattern.getFieldWithMeaning(TinkarTerm.IDENTIFIER_VALUE, latestActive.get());
                         if (rxnormData.getRxCuiId().equals(value) && RxnormUtility.getRxcuidConcept().equals(component)) {
-                            latestExists.set(true);
                             innerRxCuidCount.addAndGet(1);
                         }
                     }
@@ -118,7 +115,6 @@ public class RxnormIdentifierSemanticIT extends AbstractIntegrationTest {
                         Component component = latestIdentifierPattern.getFieldWithMeaning(TinkarTerm.IDENTIFIER_SOURCE, latestActive.get());
                         String value = latestIdentifierPattern.getFieldWithMeaning(TinkarTerm.IDENTIFIER_VALUE, latestActive.get());
                         if (rxnormData.getVuidId().equals(value) && RxnormUtility.getVuidConcept().equals(component)) {
-                            latestExists.set(true);
                             innerVuidCount.addAndGet(1);
                         }
                     }
@@ -131,7 +127,6 @@ public class RxnormIdentifierSemanticIT extends AbstractIntegrationTest {
 	                        Component component = latestIdentifierPattern.getFieldWithMeaning(TinkarTerm.IDENTIFIER_SOURCE, latestActive.get());
 	                        String value = latestIdentifierPattern.getFieldWithMeaning(TinkarTerm.IDENTIFIER_VALUE, latestActive.get());
 	                        if (ndcCode.equals(value) && RxnormUtility.getNdcIdentifierConcept().equals(component)) {
-	                            latestExists.set(true);
 	                            innerNdcCount.addAndGet(1);
 	                        }
 	        			}       			
@@ -147,7 +142,6 @@ public class RxnormIdentifierSemanticIT extends AbstractIntegrationTest {
 	                        Component component = latestIdentifierPattern.getFieldWithMeaning(TinkarTerm.IDENTIFIER_SOURCE, latestInActive.get());
 	                        String value = latestIdentifierPattern.getFieldWithMeaning(TinkarTerm.IDENTIFIER_VALUE, latestInActive.get());
 	                        if (ndcCode.equals(value) && RxnormUtility.getNdcIdentifierConcept().equals(component)) {
-	                            latestExists.set(true);
 	                            innerNdcCount.addAndGet(1);
 	                        }
 	        			}       			
@@ -156,10 +150,11 @@ public class RxnormIdentifierSemanticIT extends AbstractIntegrationTest {
 	        });    
 		}
 		
-		if(snomedCount == 0 || rxCuidCount == 0 || vuidCount == 0 || ndcCount == 0) {
-			latestExists.set(true);
-		}
-
-        return latestExists.get() && snomedCount == innerSnomedCount.get() && rxCuidCount == innerRxCuidCount.get() && vuidCount == innerVuidCount.get() && ndcCount == innerNdcCount.get();  
+		LOG.info("snomedCtId [owlCount={},dbCount={}]", snomedCount, innerSnomedCount.get());
+		LOG.info("rxCuidCount [owlCount={},dbCount={}]", rxCuidCount, innerRxCuidCount.get());
+		LOG.info("vuidCount [owlCount={},dbCount={}]", vuidCount, innerVuidCount.get());
+		LOG.info("ndcCount [owlCount={},dbCount={}]", ndcCount, innerNdcCount.get());
+		
+        return snomedCount == innerSnomedCount.get() && rxCuidCount == innerRxCuidCount.get() && vuidCount == innerVuidCount.get() && ndcCount == innerNdcCount.get();  
     }    
 }
