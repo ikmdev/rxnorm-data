@@ -150,10 +150,21 @@ public class RxnormIdentifierSemanticIT extends AbstractIntegrationTest {
 	        });    
 		}
 		
-		LOG.info("snomedCtId [owlCount={},dbCount={}]", snomedCount, innerSnomedCount.get());
-		LOG.info("rxCuidCount [owlCount={},dbCount={}]", rxCuidCount, innerRxCuidCount.get());
-		LOG.info("vuidCount [owlCount={},dbCount={}]", vuidCount, innerVuidCount.get());
-		LOG.info("ndcCount [owlCount={},dbCount={}]", ndcCount, innerNdcCount.get());
+		if (snomedCount != innerSnomedCount.get()) {
+		    LOG.debug("snomedCtId [owlCount={},dbCount={}]", snomedCount, innerSnomedCount.get());
+		}
+		
+		if (rxCuidCount != innerRxCuidCount.get()) {
+		    LOG.debug("rxCuidCount [owlCount={},dbCount={}]", rxCuidCount, innerRxCuidCount.get());
+		}
+		
+		if (vuidCount != innerVuidCount.get()) {
+		    LOG.info("vuidCount [owlCount={},dbCount={}]", vuidCount, innerVuidCount.get());
+		}
+		
+		if (ndcCount != innerNdcCount.get()) {
+		    LOG.info("ndcCount [owlCount={},dbCount={}]", ndcCount, innerNdcCount.get());
+		}
 		
         return snomedCount == innerSnomedCount.get() && rxCuidCount == innerRxCuidCount.get() && vuidCount == innerVuidCount.get() && ndcCount == innerNdcCount.get();  
     }    
