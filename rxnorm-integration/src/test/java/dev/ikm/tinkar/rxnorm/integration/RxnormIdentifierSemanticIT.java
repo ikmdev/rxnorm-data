@@ -151,19 +151,19 @@ public class RxnormIdentifierSemanticIT extends AbstractIntegrationTest {
 		}
 		
 		if (snomedCount != innerSnomedCount.get()) {
-		    LOG.debug("snomedCtId [owlCount={},dbCount={}]", snomedCount, innerSnomedCount.get());
+		    LOG.error("snomedCtId [owlCount={},dbCount={}]", snomedCount, innerSnomedCount.get());
 		}
 		
 		if (rxCuidCount != innerRxCuidCount.get()) {
-		    LOG.debug("rxCuidCount [owlCount={},dbCount={}]", rxCuidCount, innerRxCuidCount.get());
+		    LOG.error("rxCuidCount [owlCount={},dbCount={}]", rxCuidCount, innerRxCuidCount.get());
 		}
 		
 		if (vuidCount != innerVuidCount.get()) {
-		    LOG.debug("vuidCount [owlCount={},dbCount={}]", vuidCount, innerVuidCount.get());
+		    LOG.error("vuidCount [owlCount={},dbCount={}]", vuidCount, innerVuidCount.get());
 		}
 		
 		if (ndcCount != innerNdcCount.get()) {
-		    LOG.debug("ndcCount [owlCount={},dbCount={}]", ndcCount, innerNdcCount.get());
+		    LOG.error("ndcCount [owlCount={},dbCount={}]", ndcCount, innerNdcCount.get());
 		}
 		
         return snomedCount == innerSnomedCount.get() && rxCuidCount == innerRxCuidCount.get() && vuidCount == innerVuidCount.get() && ndcCount == innerNdcCount.get();  
