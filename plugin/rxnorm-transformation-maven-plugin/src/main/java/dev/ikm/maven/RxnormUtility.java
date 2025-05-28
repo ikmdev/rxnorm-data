@@ -44,7 +44,7 @@ public class RxnormUtility {
     
     public static final String HUMAN_DRUG_PATTERN_LANGUAGE_MEANING = "e515d52f-831b-4010-8507-9541a14f7b11";
     
-    public static final String VETERINERIAN_DRUG_PATTERN_LANGUAGE_MEANING = "84785d67-6cca-4caf-bbd0-113c217bb338";
+    public static final String VETERINARIAN_DRUG_PATTERN_LANGUAGE_MEANING = "84785d67-6cca-4caf-bbd0-113c217bb338";
   
     public static final String TALLMAN_SYNONYM_PATTERN_LANGUAGE_MEANING = "22f120a0-bbe7-4bd8-ac86-8c52a01d3ea6";
     

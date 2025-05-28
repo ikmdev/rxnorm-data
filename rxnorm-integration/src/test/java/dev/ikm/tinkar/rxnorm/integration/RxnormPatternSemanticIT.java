@@ -94,9 +94,7 @@ public class RxnormPatternSemanticIT extends AbstractIntegrationTest {
         }
         
         if(!rxnormData.getTallmanSynonyms().isEmpty()) {
-        	for(int i= 0; i < rxnormData.getTallmanSynonyms().size(); i++) {
-        		countTallmanSynonym++;
-        	}
+        	rxnormData.getTallmanSynonyms().size();
         }
            
         StateSet stateActive = StateSet.ACTIVE;
@@ -177,7 +175,7 @@ public class RxnormPatternSemanticIT extends AbstractIntegrationTest {
 						Concept source = (Concept) latestHumanDrugPattern.getFieldWithMeaning(EntityProxy.Concept.make(PublicIds.of(
 								UUID.fromString(RxnormUtility.HUMAN_DRUG_PATTERN_LANGUAGE_MEANING))), latestActive.get());
 						 
-						if (humanDrugConcept.nid() == source.nid()) { 
+						if (humanDrugConcept.equals(source)) { 
 							innerHumanDrugCount.addAndGet(1); 
 						}
                     }
@@ -196,9 +194,9 @@ public class RxnormPatternSemanticIT extends AbstractIntegrationTest {
 	        		if(!rxnormData.getVetDrug().isEmpty()) {
 	        			        			
 						Concept source = (Concept) latestVetDrugPattern.getFieldWithMeaning(EntityProxy.Concept.make(PublicIds.of(
-								UUID.fromString(RxnormUtility.VETERINERIAN_DRUG_PATTERN_LANGUAGE_MEANING))), latestActive.get());
+								UUID.fromString(RxnormUtility.VETERINARIAN_DRUG_PATTERN_LANGUAGE_MEANING))), latestActive.get());
 						 
-						if (vetDrugConcept.nid() == source.nid()) { 
+						if (vetDrugConcept.equals(source)) { 
 							innerVetDrugCount.addAndGet(1); 
 						}						
                     }
