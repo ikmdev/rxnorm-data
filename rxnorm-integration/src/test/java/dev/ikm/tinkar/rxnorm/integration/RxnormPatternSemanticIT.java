@@ -82,11 +82,7 @@ public class RxnormPatternSemanticIT extends AbstractIntegrationTest {
         	countVetDrug++;
         }
         
-        if(!rxnormData.getTallmanSynonyms().isEmpty()) {
-        	for(int i=0; i < rxnormData.getTallmanSynonyms().size() ; i++) {
-        		countTallmanSynonym++;
-        	}      	
-        }
+        countTallmanSynonym = rxnormData.getTallmanSynonyms().size();
            
         StateSet stateActive = StateSet.ACTIVE;
        
