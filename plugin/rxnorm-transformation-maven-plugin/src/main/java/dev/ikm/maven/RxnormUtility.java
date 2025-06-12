@@ -94,12 +94,10 @@ public class RxnormUtility {
 
                 // Extract EquivalentClasses
                 extractEquivalentClasses(block, concept);
+                extractRdfsLabel(block, concept);
+                extractSubClassOf(block,concept);
 
-                if (uri.startsWith("http://mor.nlm.nih.gov/RXNORM/")) {
-                    attributes.add(concept);
-                } else {
-                    LOG.info("Skipping RxnormData object. Id is null. {}", concept);
-                }
+                attributes.add(concept);
 
             }
         }
@@ -196,6 +194,43 @@ public class RxnormUtility {
         }
 
     }
+
+    /**
+     * Extracts rdfs:label from a class block
+     */
+    public static void extractRdfsLabel(String block, RxnormData data) {
+        Matcher rdfsLabelMatcher = Pattern.compile("rdfs:label <[^>]+> \"([^\"]*)\"").matcher(block);
+        if (rdfsLabelMatcher.find()) {
+            data.setRdfsLabel(rdfsLabelMatcher.group(1));
+        }
+    }
+
+    /**
+     * Extracts SubClassOf from a class block
+     */
+    public static void extractSubClassOf(String block, RxnormData concept) {
+        int startIndex = block.indexOf("SubClassOf(");
+        if (startIndex != -1) {
+            int openParenCount = 1;
+            int endIndex = startIndex + "SubClassOf(".length();
+
+            while (openParenCount > 0 && endIndex < block.length()) {
+                char c = block.charAt(endIndex);
+                if (c == '(') {
+                    openParenCount++;
+                } else if (c == ')') {
+                    openParenCount--;
+                }
+                endIndex++;
+            }
+
+            if (openParenCount == 0) {
+                String fullSubClassOf = block.substring(startIndex, endIndex);
+                concept.setSubClassOfStr(fullSubClassOf);
+            }
+        }
+    }
+
 
     /**
      * Extracts EquivalentClasses from a class block
@@ -301,12 +336,17 @@ public class RxnormUtility {
             // Process the URI based on its format
             if (uri.startsWith("http://snomed.info/id/")) {
                 String id = uri.substring("http://snomed.info/id/".length());
-                EntityProxy.Concept concept = makeConceptProxy(namespace, id);
+                final EntityProxy.Concept concept;
+                if (id.endsWith("-FS")) {
+                    concept = makeConceptProxy(namespace, id + "rxnorm");
+                } else {
+                    concept = makeConceptProxy(namespace, id);
+                }
                 replacement = ":[" + concept.publicId().asUuidArray()[0] + "]";
             } else if (uri.startsWith("http://mor.nlm.nih.gov/RXNORM/")) {
                 // RxNorm ID
                 String id = uri.substring("http://mor.nlm.nih.gov/RXNORM/".length());
-                EntityProxy.Concept concept = makeConceptProxy(namespace, id);
+                EntityProxy.Concept concept = makeConceptProxy(namespace, id + "rxnorm");
                 replacement = ":[" + concept.publicId().asUuidArray()[0] + "]";
             } else {
                 // Unknown URI type, keep as is
@@ -338,7 +378,13 @@ public class RxnormUtility {
 
                 if (uri.startsWith("http://snomed.info/id/")) {
                     String id = uri.substring("http://snomed.info/id/".length());
-                    EntityProxy.Concept concept = makeConceptProxy(namespace, id);
+                    final EntityProxy.Concept concept;
+                    if (id.endsWith("-FS")) {
+                        concept = makeConceptProxy(namespace, id + "rxnorm");
+                    } else {
+                        concept = makeConceptProxy(namespace, id);
+                    }
+
                     replacement = "DataHasValue(:[" + concept.publicId().asUuidArray()[0] + "] \"" +
                             value + "\"^^xsd:" + dataType + ")";
                 } else {
@@ -350,6 +396,41 @@ public class RxnormUtility {
         }
         matcher.appendTail(result);
 
+        return result.toString();
+    }
+
+    public static String transformOwlStringSubClassesOf(UUID namespace, String owlString) {
+        // First, let's handle URIs in the entire string
+        Pattern uriPattern = Pattern.compile("<(http://[^>]+)>");
+        Matcher matcher = uriPattern.matcher(owlString);
+        StringBuffer result = new StringBuffer();
+
+        while (matcher.find()) {
+            String uri = matcher.group(1);
+            String replacement;
+            // Process the URI based on its format
+            if (uri.startsWith("http://snomed.info/id/")) {
+                String id = uri.substring("http://snomed.info/id/".length());
+                final EntityProxy.Concept concept;
+                if (id.endsWith("-FS")) {
+                    concept = makeConceptProxy(namespace, id + "rxnorm");
+                } else {
+                    concept = makeConceptProxy(namespace, id);
+                }
+
+                replacement = ":[" + concept.publicId().asUuidArray()[0] + "]";
+            } else if (uri.startsWith("http://mor.nlm.nih.gov/RXNORM/")) {
+                // RxNorm ID
+                String id = uri.substring("http://mor.nlm.nih.gov/RXNORM/".length());
+                EntityProxy.Concept concept = makeConceptProxy(namespace, id + "rxnorm");
+                replacement = ":[" + concept.publicId().asUuidArray()[0] + "]";
+            } else {
+                // Unknown URI type, keep as is
+                replacement = "<" + uri + ">";
+            }
+            matcher.appendReplacement(result, Matcher.quoteReplacement(replacement));
+        }
+        matcher.appendTail(result);
         return result.toString();
     }
 

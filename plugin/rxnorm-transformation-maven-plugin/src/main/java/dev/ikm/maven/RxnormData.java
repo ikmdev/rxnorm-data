@@ -26,11 +26,15 @@ public class RxnormData {
     private String vetDrug = "";
     private List<String> tallmanSynonyms = new ArrayList<>();
     private String equivalentClassesStr = "";
+    private String rdfsLabel = "";
+    private String subClassOfStr = "";
 
     public RxnormData(String uri) {
         this.uri = uri;
         if (uri.startsWith("http://mor.nlm.nih.gov/RXNORM/")) {
             this.id = uri.substring("http://mor.nlm.nih.gov/RXNORM/".length());
+        } else {
+            this.id = uri.substring("http://snomed.info/id/".length());
         }
     }
 
@@ -84,6 +88,14 @@ public class RxnormData {
 
     public void setVetDrug(String vetDrug) {
         this.vetDrug = vetDrug;
+    }
+
+    public void setRdfsLabel(String rdfsLabel) {
+        this.rdfsLabel = rdfsLabel;
+    }
+
+    public void setSubClassOfStr(String subClassOfStr) {
+        this.subClassOfStr = subClassOfStr;
     }
 
     public void addTallmanSynonym(String tallmanSynonym) {
@@ -157,6 +169,14 @@ public class RxnormData {
 
     public String getEquivalentClassesStr() {
         return equivalentClassesStr;
+    }
+
+    public String getRdfsLabel() {
+        return rdfsLabel;
+    }
+
+    public String getSubClassOfStr() {
+        return subClassOfStr;
     }
 
     @Override
