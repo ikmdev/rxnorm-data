@@ -50,7 +50,7 @@
         <source.zip>${user.home}/Downloads/Pilot-Defined-RxNorm-with-SNCT-classes-${source.version}-with-custom-annotations.owl</source.zip>
         <snomed.source.zip>${user.home}/Downloads/SnomedCT_InternationalRF2_PRODUCTION_20250401T120000Z.zip</snomed.source.zip>
         <starterSetLocation>${user.home}/Downloads</starterSetLocation>
-        <starterSet>5-1RxNormStarterSet.zip</starterSet>
+        <starterSet>RxNorm Starter Export 07072025.zip</starterSet>
         <fieldCategoriesStarterSetLocation>${user.home}/Downloads</fieldCategoriesStarterSetLocation>
         <fieldCategoriesStarterSet>FieldCategories-nonprimordial-unreasoned-pb.zip</fieldCategoriesStarterSet>
         <dataStoreLocation>${project.basedir}/../target</dataStoreLocation>
