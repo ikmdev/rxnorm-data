@@ -20,33 +20,31 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class RxnormUtility {
-    public static final String RXNORM_MODULE = "e7ead9cc-3711-4353-92b6-8e5d4f4ec723";
-    public static final String RXNORM_AUTHOR = "0d6d7eb2-3d2d-4ea9-bd54-7f33e74ff815";
-    public static final String SNOMED_IDENTIFIER_PUBLIC_ID = "35d6b6cb-b927-4e92-a47b-542f972cd692";
-    public static final String RXCUID_IDENTIFIER_PUBLIC_ID = "6b3930f9-26e2-48da-97ac-b26a567b570b";
-    public static final String NDC_IDENTIFIER_PUBLIC_ID = "d8ab8e6b-5b77-49f9-8db0-1e7343267740";
-    public static final String VU_IDENTIFIER_PUBLIC_ID = "e6d07757-5461-4687-a4ad-0a40ce4cc539";
-    public static final String TALLMAN_DESCRIPTION = "84785d67-6cca-4caf-bbd0-113c217bb338";
-    public static final String QUALITATIVE_DISTINCTION_PATTERN = "df1c8881-19e7-4159-86a0-91dff62a3d46";
-    public static final String QUANTITY_PATTERN = "1be49e47-30a0-417c-a254-2a15c7118aea";
-    public static final String SCHEDULE_PATTERN = "8a2e0eb3-80bd-4b61-a628-013a0c920f3d";
-    public static final String HUMAN_DRUG_PATTERN = "4f875c6a-b679-470d-ab72-9aa640ea9f87";
-    public static final String VET_DRUG_PATTERN = "4cbcd401-2edf-4859-8473-ff075b8178d1";
-    public static final String TALLMAN_SYNONYM_PATTERN = "2f75c349-ee27-4113-9c58-1b37c76abf62";
+    public static final String RXNORM_MODULE = "eaeb4482-4c5b-4c0c-9d41-fa021bd10c30";
+    public static final String SNOMED_IDENTIFIER_PUBLIC_ID = "a7035c97-c728-4e9e-99bb-21d3f5384583";
+    public static final String RXCUID_IDENTIFIER_PUBLIC_ID = "edcf08eb-f5c1-4893-9a51-53a9d8201d8f";
+    public static final String NDC_IDENTIFIER_PUBLIC_ID = "aea76ea1-5ee2-485f-8a4e-5d94610fe84f";
+    public static final String VU_IDENTIFIER_PUBLIC_ID = "0385c5c5-9749-4625-8c83-b638bfec8fda";
+    public static final String QUALITATIVE_DISTINCTION_PATTERN = "d2a8460f-0676-4f0b-aa0f-b6275b5506a0";
+    public static final String QUANTITY_PATTERN = "05a40a30-1456-42a2-aa27-c902fe4185d8";
+    public static final String SCHEDULE_PATTERN = "e52dd008-06db-4a8d-940c-6988bf42d26a";
+    public static final String HUMAN_DRUG_PATTERN = "3a85992d-820d-4d7a-9ec3-e2af7a7bbfb3";
+    public static final String VET_DRUG_PATTERN = "590fc8df-8cd8-4338-80b0-7ca2bceeb677";
+    public static final String TALLMAN_SYNONYM_PATTERN = "8b5f06c8-4ec5-4918-8a6c-fa11fe41264a";
     
-    public static final String QUALITATIVE_PATTERN_DISTINCTION_MEANING = "f1ac8825-9e73-43c3-9a2d-a4c45acb623f";
-    public static final String QUALITATIVE_PATTERN_LANGUAGE_MEANING = "8255b976-1b0b-4fc9-9a46-76c4866b822f";
+    public static final String QUALITATIVE_PATTERN_DISTINCTION_MEANING = "b33b4b92-124c-4bb8-81a7-4d92c714e784";
+    public static final String QUALITATIVE_PATTERN_LANGUAGE_MEANING = "cd56cceb-8507-5ae5-a928-16079fe6f832";
     
-    public static final String QUANTITY_PATTERN_DRUG_MEANING = "70785113-4769-42d1-bf3b-2281318c8870";
+    public static final String QUANTITY_PATTERN_DRUG_MEANING = "91089d31-5893-4033-9d07-fb03555c0b96";
     
-    public static final String SCHEDULE_PATTERN_DRUG_MEANING = "a5f5e459-cd14-48fe-95e6-ab0dfff323a6";
-    public static final String SCHEDULE_PATTERN_LANGUAGE_MEANING = "6017102b-23f5-4d62-ac7c-5827858885b1";
+    public static final String SCHEDULE_PATTERN_DRUG_MEANING = "60c0239e-7f89-496f-beab-e0c2cb5fb6a3";
+    public static final String SCHEDULE_PATTERN_LANGUAGE_MEANING = "1561f545-d7e0-404a-8063-3ba6dc483410";
     
-    public static final String HUMAN_DRUG_PATTERN_LANGUAGE_MEANING = "e515d52f-831b-4010-8507-9541a14f7b11";
+    public static final String HUMAN_DRUG_PATTERN_LANGUAGE_MEANING = "a31169af-8b9a-4ef3-9cce-fef79434358e";
     
-    public static final String VETERINARIAN_DRUG_PATTERN_LANGUAGE_MEANING = "84785d67-6cca-4caf-bbd0-113c217bb338";
+    public static final String VETERINARIAN_DRUG_PATTERN_LANGUAGE_MEANING = "1cc614bd-7d47-4ae0-811d-aa3a2874652d";
   
-    public static final String TALLMAN_SYNONYM_PATTERN_LANGUAGE_MEANING = "22f120a0-bbe7-4bd8-ac86-8c52a01d3ea6";
+    public static final String TALLMAN_SYNONYM_PATTERN_LANGUAGE_MEANING = "2db79d40-280a-4697-8b7b-284d1f4de275";
     
     private static final Logger LOG = LoggerFactory.getLogger(RxnormUtility.class.getSimpleName());
     
@@ -302,9 +300,6 @@ public class RxnormUtility {
     }
     public static EntityProxy.Concept getNdcIdentifierConcept(){
         return EntityProxy.Concept.make(PublicIds.of(UUID.fromString(NDC_IDENTIFIER_PUBLIC_ID)));
-    }
-    public static EntityProxy.Concept getTallmanSynonymDescriptionConcept(){
-        return EntityProxy.Concept.make(PublicIds.of(UUID.fromString(TALLMAN_DESCRIPTION)));
     }
     public static EntityProxy.Pattern getQualitativeDistinctionPattern(){
         return EntityProxy.Pattern.make(PublicIds.of(UUID.fromString(QUALITATIVE_DISTINCTION_PATTERN)));

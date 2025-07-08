@@ -11,9 +11,15 @@ import dev.ikm.tinkar.composer.Session;
 import dev.ikm.tinkar.composer.assembler.ConceptAssembler;
 import dev.ikm.tinkar.composer.assembler.SemanticAssembler;
 import dev.ikm.tinkar.composer.template.AxiomSyntax;
+import dev.ikm.tinkar.composer.template.Definition;
+import dev.ikm.tinkar.composer.template.FullyQualifiedName;
+import dev.ikm.tinkar.composer.template.Identifier;
+import dev.ikm.tinkar.composer.template.StatedAxiom;
+import dev.ikm.tinkar.composer.template.Synonym;
 import dev.ikm.tinkar.entity.EntityService;
 import dev.ikm.tinkar.terms.EntityProxy;
 import dev.ikm.tinkar.terms.State;
+import dev.ikm.tinkar.terms.TinkarTerm;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -67,7 +73,6 @@ public class RxnormTransformationMojo extends AbstractMojo {
     @Parameter(property = "controllerName", defaultValue = "Open SpinedArrayStore")
     private String controllerName;
     private UUID namespace;
-    private final String rxnormAuthorStr = "RxNorm Author";
     private EntityProxy.Concept rxnormAuthor;
 
     private final String rxnormModuleStr = "RxNorm Module";
@@ -80,7 +85,6 @@ public class RxnormTransformationMojo extends AbstractMojo {
         this.namespace = UUID.fromString(namespaceString);
         File datastore = new File(datastorePath);
         this.rxnormModule = EntityProxy.Concept.make(PublicIds.of(UUID.fromString(RxnormUtility.RXNORM_MODULE)));
-        this.rxnormAuthor = EntityProxy.Concept.make(PublicIds.of(UUID.fromString(RxnormUtility.RXNORM_AUTHOR)));
 
 //        try {
 //            unzipRawData(inputDirectoryPath);
@@ -95,6 +99,7 @@ public class RxnormTransformationMojo extends AbstractMojo {
             Composer composer = new Composer("Rxnorm Transformer Composer");
 
             try {
+                createAuthor(composer);
                 LOG.info("Starting rxnorm owl file processing...");
                 createConcepts(composer);
             } catch (Exception e) {
@@ -108,6 +113,41 @@ public class RxnormTransformationMojo extends AbstractMojo {
             PrimitiveData.stop();
             LOG.info("########## Rxnorm Transformation Completed.");
         }
+    }
+
+    private void createAuthor(Composer composer) {
+        this.rxnormAuthor = EntityProxy.Concept.make("RxNorm Author", UuidT5Generator.get(namespace,("RxNorm Author")));
+
+        Session session = composer.open(State.ACTIVE,
+                rxnormAuthor,
+                this.rxnormModule,
+                TinkarTerm.DEVELOPMENT_PATH);
+
+        session.compose((ConceptAssembler concept) -> concept
+                .concept(rxnormAuthor)
+                .attach((FullyQualifiedName fqn) -> fqn
+                        .language(ENGLISH_LANGUAGE)
+                        .text("RxNorm Author")
+                        .caseSignificance(DESCRIPTION_NOT_CASE_SENSITIVE)
+                )
+                .attach((Synonym synonym)-> synonym
+                        .language(ENGLISH_LANGUAGE)
+                        .text("RxNorm Author")
+                        .caseSignificance(DESCRIPTION_NOT_CASE_SENSITIVE)
+                )
+                .attach((Definition definition) -> definition
+                        .language(ENGLISH_LANGUAGE)
+                        .text("RxNorm Author")
+                        .caseSignificance(DESCRIPTION_NOT_CASE_SENSITIVE)
+                )
+                .attach((Identifier identifier) -> identifier
+                        .source(TinkarTerm.UNIVERSALLY_UNIQUE_IDENTIFIER)
+                        .identifier(rxnormAuthor.asUuidArray()[0].toString())
+                )
+                .attach((StatedAxiom statedAxiom) -> statedAxiom
+                        .isA(TinkarTerm.USER)
+                )
+        );
     }
 
     /**
