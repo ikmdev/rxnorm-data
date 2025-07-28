@@ -23,7 +23,7 @@ if /i "%PROFILE%"=="profile1" (
 
     echo === Running profile1 ===
 
-    for %%M in (plugin rxnorm-origin rxnorm-pipeline rxnorm-integration rxnorm-export) do (
+    for %%M in (plugin rxnorm-origin rxnorm-pipeline rxnorm-starterdata) do (
 
         echo Running: rxnorm-data\%%M
 
