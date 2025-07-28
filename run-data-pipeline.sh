@@ -34,7 +34,7 @@ if [ "$PROFILE" == "profile1" ]; then
 
 
 
-  for module in plugin snomed-ct-loinc-origin snomed-ct-loinc-starterdata snomed-ct-loinc-pipeline snomed-ct-loinc-integration snomed-ct-loinc-export; do
+  for module in plugin snomed-ct-loinc-origin snomed-ct-loinc-starterdata snomed-ct-loinc-pipeline; do
 
     echo "Running: snomed-ct-loinc-data/$module"
 

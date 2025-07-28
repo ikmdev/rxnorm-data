@@ -31,7 +31,7 @@ if /i "%PROFILE%"=="profile1" (
 
     )
 
-    for %%M in (plugin snomed-ct-loinc-origin snomed-ct-loinc-starterdata snomed-ct-loinc-pipeline snomed-ct-loinc-integration snomed-ct-loinc-export) do (
+    for %%M in (plugin snomed-ct-loinc-origin snomed-ct-loinc-starterdata snomed-ct-loinc-pipeline) do (
 
         echo Running: snomed-ct-loinc-data\%%M
 
