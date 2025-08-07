@@ -24,7 +24,7 @@
 
     <properties>
         <!-- maven plugins -->
-        <maven-artifacts.version>1.31.0</maven-artifacts.version>
+        <maven-artifacts.version>1.33.0</maven-artifacts.version>
         <maven-assembly-plugin.version>3.7.1</maven-assembly-plugin.version>
         <exec-maven-plugin.version>3.4.1</exec-maven-plugin.version>
         <maven-dependency-plugin.version>3.8.0</maven-dependency-plugin.version>
@@ -42,8 +42,8 @@
         <!-- starter data -->
         <tinkar-starter-data.groupId>dev.ikm.data.tinkar</tinkar-starter-data.groupId>
         <tinkar-starter-data.artifactId>tinkar-starter-data</tinkar-starter-data.artifactId>
-        <tinkar-starter-data.classifier>unreasoned-sa</tinkar-starter-data.classifier>
-        <tinkar-starter-data.version>1.7.0</tinkar-starter-data.version>
+        <tinkar-starter-data.classifier>unreasoned-pb</tinkar-starter-data.classifier>
+        <tinkar-starter-data.version>20250807</tinkar-starter-data.version>
         <!-- origin -->
         <origin.working.directory>${project.build.directory}/origin-sources</origin.working.directory>
         <source.version>2024-04-10</source.version>
@@ -51,8 +51,6 @@
         <snomed.source.zip>${user.home}/Downloads/SnomedCT_InternationalRF2_PRODUCTION_20250401T120000Z.zip</snomed.source.zip>
         <starterSetLocation>${user.home}/Downloads</starterSetLocation>
         <starterSet>RxNorm Starter Export 07072025.zip</starterSet>
-        <fieldCategoriesStarterSetLocation>${user.home}/Downloads</fieldCategoriesStarterSetLocation>
-        <fieldCategoriesStarterSet>FieldCategories-nonprimordial-unreasoned-pb.zip</fieldCategoriesStarterSet>
         <dataStoreLocation>${project.basedir}/../target</dataStoreLocation>
         <dataStore>rxnorm</dataStore>
         <reasoner-type>ElkSnomedReasoner</reasoner-type>
