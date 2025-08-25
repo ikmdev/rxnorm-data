@@ -17,83 +17,10 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-clean-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>clean</id>
-                        <phase>clean</phase>
-                        <goals>
-                            <goal>clean</goal>
-                        </goals>
-                        <configuration>
-                            <filesets>
-                                <fileset>
-                                    <directory>${dataStoreLocation}/${tinkar-starter-data.artifactId}-${tinkar-starter-data.version}-${tinkar-starter-data.classifier}</directory>
-                                    <includes>
-                                        <include>**</include>
-                                    </includes>
-                                    <followSymlinks>false</followSymlinks>
-                                </fileset>
-                                <fileset>
-                                    <directory>${dataStoreLocation}/${dataStore}</directory>
-                                    <includes>
-                                        <include>**</include>
-                                    </includes>
-                                    <followSymlinks>false</followSymlinks>
-                                </fileset>
-                            </filesets>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>copy-tinkar-starter-data-dependency</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>copy</goal>
-                        </goals>
-                        <configuration>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>${tinkar-starter-data.groupId}</groupId>
-                                    <artifactId>${tinkar-starter-data.artifactId}</artifactId>
-                                    <version>${tinkar-starter-data.version}</version>
-                                    <classifier>${tinkar-starter-data.classifier}</classifier>
-                                    <type>zip</type>
-                                    <overWrite>true</overWrite>
-                                    <outputDirectory>${dataStoreLocation}/input-data</outputDirectory>
-                                </artifactItem>
-                            </artifactItems>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
                 <groupId>dev.ikm.maven.tinkar</groupId>
                 <artifactId>tinkar-maven-plugin</artifactId>
                 <version>${maven-artifacts.version}</version>
                 <executions>
-                    <execution>
-                        <configuration>
-                            <dataStore>${dataStoreLocation}/${dataStore}</dataStore>
-                            <fileset>
-                                <directory>${dataStoreLocation}/input-data</directory>
-                                <includes>
-                                    <include>**/*-${tinkar-starter-data.classifier}.zip</include>
-                                </includes>
-                            </fileset>
-                        </configuration>
-                        <id>load-data-tinkar-starter-data</id>
-                        <phase>install</phase>
-                        <goals>
-                            <goal>load-data</goal>
-                        </goals>
-                    </execution>
                     <execution>
                         <configuration>
                             <dataStore>${dataStoreLocation}/${dataStore}</dataStore>
@@ -108,24 +35,6 @@
                         <phase>install</phase>
                         <goals>
                             <goal>load-data</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>dev.ikm.maven</groupId>
-                <artifactId>snomed-ct-starterdata-maven-plugin</artifactId>
-                <version>1.0.0-SNAPSHOT</version>
-                <configuration>
-                    <namespaceString>${origin.namespace}</namespaceString>
-                    <datastorePath>${dataStoreLocation}/${dataStore}</datastorePath>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>run-snomed-starterdata</id>
-                        <phase>install</phase>
-                        <goals>
-                            <goal>run-snomed-starterdata</goal>
                         </goals>
                     </execution>
                 </executions>
