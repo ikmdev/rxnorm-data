@@ -30,6 +30,7 @@
                                     <include>**/${starterSet}</include>
                                 </includes>
                             </fileset>
+                            <isolate>false</isolate>
                         </configuration>
                         <id>load-data-rxnorm-starter-data</id>
                         <phase>install</phase>

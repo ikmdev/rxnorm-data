@@ -75,7 +75,7 @@
                                     </formats>
                                     <fileSets>
                                         <fileSet>
-                                            <outputDirectory>${dataStore}</outputDirectory>
+                                            <outputDirectory>rxnorm</outputDirectory>
                                             <directory>${dataStoreLocation}/${dataStore}</directory>
                                             <includes>
                                                 <include>**</include>
