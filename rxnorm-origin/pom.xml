@@ -32,16 +32,6 @@
                         </configuration>
                     </execution>
                     <execution>
-                        <id>process-snomed-origin</id>
-                        <goals>
-                            <goal>unzip-source</goal>
-                        </goals>
-                        <configuration>
-                            <source>${snomed.source.zip}</source>
-                            <outputDirectory>${origin.working.directory}</outputDirectory>
-                        </configuration>
-                    </execution>
-                    <execution>
                         <id>create-origin-manifest</id>
                         <goals>
                             <goal>generate-manifest-resource</goal>
