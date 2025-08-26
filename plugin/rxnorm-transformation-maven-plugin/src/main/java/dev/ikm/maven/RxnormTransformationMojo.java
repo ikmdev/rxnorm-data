@@ -6,6 +6,7 @@ import dev.ikm.tinkar.common.service.PrimitiveData;
 import dev.ikm.tinkar.common.service.ServiceKeys;
 import dev.ikm.tinkar.common.service.ServiceProperties;
 import dev.ikm.tinkar.common.util.uuid.UuidT5Generator;
+import dev.ikm.tinkar.common.util.uuid.UuidUtil;
 import dev.ikm.tinkar.composer.Composer;
 import dev.ikm.tinkar.composer.Session;
 import dev.ikm.tinkar.composer.assembler.ConceptAssembler;
@@ -180,6 +181,9 @@ public class RxnormTransformationMojo extends AbstractMojo {
                         rxnormConcept.getNdcCodes().isEmpty()) {
                     createLabelOnlyConcept(rxnormConcept, timeForStamp, composer);
                 } else {
+                    if (!rxnormConcept.getSnomedCtId().isEmpty()) {
+                        createRxNormSnomedMappingConcept(rxnormConcept.getId(), rxnormConcept.getSnomedCtId(), timeForStamp, composer);
+                    }
                     createRxnormConcept(rxnormConcept, timeForStamp, composer);
                 }
             }
@@ -189,6 +193,17 @@ public class RxnormTransformationMojo extends AbstractMojo {
         } catch (Exception e) {
             LOG.error("Error processing RxNorm OWL file", e);
         }
+    }
+
+    private void createRxNormSnomedMappingConcept(String rxnormId, String snomedCtId, long time, Composer composer) {
+        Session session = composer.open(State.ACTIVE, time + 1000, rxnormAuthor, rxnormModule, DEVELOPMENT_PATH);
+
+        UUID snomedUuid = UuidT5Generator.get(UuidUtil.SNOMED_NAMESPACE, snomedCtId);
+        UUID rxNormUuid = UuidT5Generator.get(namespace, rxnormId + "rxnorm");
+
+        session.compose((ConceptAssembler conceptAssembler) -> conceptAssembler
+                .concept(EntityProxy.Concept.make(PublicIds.of(snomedUuid, rxNormUuid)))
+        );
     }
 
     /**
