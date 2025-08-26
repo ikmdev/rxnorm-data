@@ -309,8 +309,8 @@ public class RxnormTransformationMojo extends AbstractMojo {
         try {
 
             if(!rxnormData.getSnomedCtId().isEmpty()) {
-                EntityProxy.Semantic semantic = EntityProxy.Semantic.make(
-                        PublicIds.of(UuidT5Generator.get(namespace, concept.publicId().asUuidArray()[0] + rxnormData.getSnomedCtId() + "SNOMEDID")));
+                EntityProxy.Semantic semantic = EntityProxy.Semantic.make(PublicIds.of(
+                        UuidT5Generator.get(UuidUtil.SNOMED_NAMESPACE, rxnormData.getSnomedCtId() + "snomed")));
                 EntityProxy.Concept snomedIdentifier = RxnormUtility.getSnomedIdentifierConcept();
                 session.compose((SemanticAssembler semanticAssembler) -> semanticAssembler
                         .semantic(semantic)
