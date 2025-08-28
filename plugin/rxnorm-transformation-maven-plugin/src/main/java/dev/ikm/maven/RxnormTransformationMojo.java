@@ -87,11 +87,11 @@ public class RxnormTransformationMojo extends AbstractMojo {
         File datastore = new File(datastorePath);
         this.rxnormModule = EntityProxy.Concept.make(PublicIds.of(UUID.fromString(RxnormUtility.RXNORM_MODULE)));
 
-//        try {
-//            unzipRawData(inputDirectoryPath);
-//        } catch (IOException e) {
-//            throw new RuntimeException(e);
-//        }
+        try {
+            unzipRawData(inputDirectoryPath);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
         initializeDatastore(datastore);
         EntityService.get().beginLoadPhase();
