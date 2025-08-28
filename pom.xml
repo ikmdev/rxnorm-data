@@ -43,7 +43,8 @@
         <!-- origin -->
         <origin.working.directory>${project.build.directory}/origin-sources</origin.working.directory>
         <source.version>2024-04-10</source.version>
-        <source.zip>${user.home}/Downloads/Pilot-Defined-RxNorm-with-SNCT-classes-${source.version}-with-custom-annotations.owl</source.zip>
+        <rxnormOwl>Pilot-Defined-RxNorm-with-SNCT-classes-${source.version}-with-custom-annotations.owl</rxnormOwl>
+        <source.zip>${user.home}/Downloads/${rxnormOwl}</source.zip>
         <starterSetLocation>${user.home}/Downloads</starterSetLocation>
         <starterSet>RxNorm Starter Export 07072025.zip</starterSet>
         <dataStoreLocation>${project.basedir}/../../snomed-ct-data/target</dataStoreLocation>
