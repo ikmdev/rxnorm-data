@@ -24,17 +24,17 @@ git clone [Rep URL]
 
 6. Create a ~/Solor directory and ensure ~/Solor/generated-data does not exist or is empty.
 
-7. Enter the following command to build the dataset:
+7. You can create a reasoned or unreasoned dataset by either including or commenting out the rxnorm-data/pom.xml <module>rxnorm-reasoner</module>
+
+8. Enter the following command to build the dataset:
 
 ```bash
 mvn clean install -U "-DMaven.build.cache.enable=false"
 ```
 
-8. Enter the following command to deploy the dataset:
+9. Enter the following command to deploy the dataset:
 
 ```bash
 mvn deploy -f rxnorm-export "-DdeployToNexus=true" "-Dmaven.deploy.skip=true" "-Dmaven.build.cache.enabled=false"
 ```
-
-9. You can create a reasoned or unreasoned dataset by either including or commenting out the rxnorm-data/pom.xml <module>rxnorm-reasoner</module>
 
