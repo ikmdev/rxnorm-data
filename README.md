@@ -15,9 +15,9 @@ git clone [Rep URL]
 
 2. Change local directory to `rxnorm-data`
 
-3. Download US or International RF2 Files from SNOMED CT: https://www.nlm.nih.gov/healthit/snomedct/index.html
+3. Download RxNorm File from National Library of Medicine (RxNorm-in-OWL/RxNorm Files): https://www.nlm.nih.gov/research/umls/rxnorm/index.html
 
-4. Place the downloaded SnomedCT_*_.zip in your local Downloads directory.
+4. Place the downloaded Pilot-Defined-RxNorm_*_.owl in your local Downloads directory.
 
 5. Ensure the rxnorm-data/pom.xml contains the proper tags containing source filename for the downloaded files such as:
    <source.zip>, <source.version>, <snomed.source.zip>, <starterSet>, etc.
