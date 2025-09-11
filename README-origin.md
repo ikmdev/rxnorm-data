@@ -36,6 +36,6 @@ mvn deploy -f rxnorm-origin -DdeployToNexus=true -Dmaven.deploy.skip=true -Dmave
 <dependency>
   <groupId>dev.ikm.data.rxnorm</groupId>
   <artifactId>rxnorm-origin</artifactId>
-  <version>Pilot-Defined-RxNorm-with-SNCT-classes-2024-04-10-with-custom-annotations.owl</version>
+  <version>Pilot-Defined-RxNorm-2024-04-10+1.0.0-SNAPSHOT</version>
 </dependency>
 ```

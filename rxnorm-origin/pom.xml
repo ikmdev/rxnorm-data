@@ -14,6 +14,27 @@
 
     <name>rxnorm-origin</name>
 
+    <!-- Properties For Deploying Zip To Nexus -->
+    <properties>
+        <data-artifact.groupId>dev.ikm.data.rxnorm</data-artifact.groupId>
+        <data-artifact.artifactId>rxnorm-origin</data-artifact.artifactId>
+        <data-artifact.filename>${data-artifact.path-prefix}</data-artifact.filename>
+        <data-artifact.version>Pilot-Defined-RxNorm_${source.version}+1.0.0-SNAPSHOT</data-artifact.version>
+        <data-artifact.prefix>${project.artifactId}-${project.version}</data-artifact.prefix>
+        <data-artifact.path-prefix>${project.build.directory}/${data-artifact.prefix}</data-artifact.path-prefix>
+        <deployNexusURL>https://nexus.tinkarbuild.com/repository/private-assets/</deployNexusURL>
+        <deployToNexus>false</deployToNexus>
+    </properties>
+
+    <!-- Distribution info for private assets repo in Nexus -->
+    <distributionManagement>
+        <repository>
+            <id>nexus</id>
+            <name>private-assets-nexus</name>
+            <url>${deployNexusURL}</url>
+        </repository>
+    </distributionManagement>
+
     <build>
         <plugins>
             <!-- Unzip source data -->
