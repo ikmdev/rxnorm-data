@@ -132,4 +132,77 @@
             </plugin>
         </plugins>
     </build>
+
+
+    <profiles>
+        <!-- Profile to generate data/template pom -->
+        <profile>
+            <id>generateData</id>
+            <activation>
+                <property>
+                    <name>deployToNexus</name>
+                    <value>true</value>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>templating-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>inject-maven-properties</id>
+                                <goals>
+                                    <goal>filter-sources</goal>
+                                </goals>
+                                <configuration>
+                                    <sourceDirectory>rxnorm-origin-pom-template</sourceDirectory>
+                                    <outputDirectory>${project.build.directory}</outputDirectory>
+                                    <skipPoms>false</skipPoms>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <!-- Deploy Zip File To Nexus -->
+        <profile>
+            <id>deployZipArtifacts</id>
+            <activation>
+                <property>
+                    <name>deployToNexus</name>
+                    <value>true</value>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-deploy-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>deploy-origin-data</id>
+                                <phase>deploy</phase>
+                                <goals>
+                                    <goal>deploy-file</goal>
+                                </goals>
+                                <configuration>
+                                    <repositoryId>nexus</repositoryId>
+                                    <url>${deployNexusURL}</url>
+                                    <groupId>${data-artifact.groupId}</groupId>
+                                    <artifactId>${data-artifact.artifactId}</artifactId>
+                                    <version>${data-artifact.version}</version>
+                                    <pomFile>${project.build.directory}/rxnorm-origin-pom.xml</pomFile>
+                                    <file>${data-artifact.filename}-data.zip</file>
+                                    <packaging>zip</packaging>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
