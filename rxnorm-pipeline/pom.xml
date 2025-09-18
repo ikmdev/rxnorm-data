@@ -17,7 +17,6 @@
 
     <properties>
         <origin.directory>${project.build.directory}/origin-data</origin.directory>
-        <snomedct.version>20250801T120000Z+1.0.0-SNAPSHOT</snomedct.version>
     </properties>
 
     <build>
@@ -42,26 +41,6 @@
                                     <type>zip</type>
                                     <overWrite>true</overWrite>
                                     <outputDirectory>${origin.directory}</outputDirectory>
-                                </artifactItem>
-                            </artifactItems>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>unpack-datastore-dependency</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>unpack</goal>
-                        </goals>
-                        <configuration>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>dev.ikm.tinkar.data</groupId>
-                                    <artifactId>snomedct-international</artifactId>
-                                    <version>${snomedct.version}</version>
-                                    <classifier>reasoned-sa</classifier>
-                                    <type>zip</type>
-                                    <overWrite>true</overWrite>
-                                    <outputDirectory>${project.build.directory}/${dataStore}</outputDirectory>
                                 </artifactItem>
                             </artifactItems>
                         </configuration>

@@ -51,18 +51,18 @@
         <rxnormOwl>Pilot-Defined-RxNorm-with-SNCT-classes-${source.version}-with-custom-annotations.owl</rxnormOwl>
         <source.zip>${user.home}/Downloads/${rxnormOwl}</source.zip>
         <starterSet>RxNorm Starter Export 07072025.zip</starterSet>
-<!--        <dataStoreLocation>${project.basedir}/../target</dataStoreLocation>-->
-        <dataStoreLocation>${project.basedir}/../../snomed-ct-data/target</dataStoreLocation>
-        <dataStore>snomedct-international</dataStore>
+        <dataStoreLocation>${project.basedir}/../target</dataStoreLocation>
+        <dataStore>rxnorm</dataStore>
         <reasoner-type>ElkSnomedReasoner</reasoner-type>
         <rxnorm-origin.version>${dataStore}-${source.version}+1.0.0-SNAPSHOT</rxnorm-origin.version>
+        <snomedct.version>20250801T120000Z+1.0.0-SNAPSHOT</snomedct.version>
 
         <!-- origin -->
         <packager.name>IKM Dev</packager.name>
         <origin.url>https://www.nlm.nih.gov/research/umls/rxnorm/docs/rxnormfiles.html</origin.url>
         <origin.namespace>3094dbd1-60cf-44a6-92e3-0bb32ca4d3de</origin.namespace>
-
     </properties>
+
     <dependencyManagement>
         <dependencies>
             <dependency>
