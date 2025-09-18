@@ -19,13 +19,12 @@
             <plugin>
                 <groupId>dev.ikm.maven.tinkar</groupId>
                 <artifactId>tinkar-maven-plugin</artifactId>
-                <version>${maven-artifacts.version}</version>
                 <executions>
                     <execution>
                         <configuration>
                             <dataStore>${dataStoreLocation}/${dataStore}</dataStore>
                             <fileset>
-                                <directory>${starterSetLocation}</directory>
+                                <directory>${project.basedir}/src/main/resources</directory>
                                 <includes>
                                     <include>**/${starterSet}</include>
                                 </includes>

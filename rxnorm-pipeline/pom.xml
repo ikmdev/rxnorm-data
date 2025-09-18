@@ -16,22 +16,66 @@
     <url>http://maven.apache.org</url>
 
     <properties>
-        <maven.compiler.source>23</maven.compiler.source>
-        <maven.compiler.target>23</maven.compiler.target>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <origin.directory>${project.build.directory}/origin-data</origin.directory>
+        <snomedct.version>20250801T120000Z+1.0.0-SNAPSHOT</snomedct.version>
     </properties>
 
     <build>
         <plugins>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-origin-data</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <stripVersion>true</stripVersion>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>dev.ikm.data.rxnorm</groupId>
+                                    <artifactId>rxnorm-origin</artifactId>
+                                    <version>${rxnorm-origin.version}</version>
+                                    <type>zip</type>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>${origin.directory}</outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>unpack-datastore-dependency</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>dev.ikm.tinkar.data</groupId>
+                                    <artifactId>snomedct-international</artifactId>
+                                    <version>${snomedct.version}</version>
+                                    <classifier>reasoned-sa</classifier>
+                                    <type>zip</type>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>${project.build.directory}/${dataStore}</outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <groupId>dev.ikm.rxnorm</groupId>
                 <artifactId>rxnorm-transformation-maven-plugin</artifactId>
-                <version>1.0.0-SNAPSHOT</version>
                 <configuration>
                     <namespaceString>${origin.namespace}</namespaceString>
                     <rxnormOwl>${project.build.directory}/src/${rxnormOwl}</rxnormOwl>
                     <datastorePath>${dataStoreLocation}/${dataStore}</datastorePath>
-                    <inputDirectoryPath>${user.home}/.m2/repository/dev/ikm/rxnorm/rxnorm-origin/${project.version}/rxnorm-origin-${project.version}-data.zip</inputDirectoryPath>
+                    <inputDirectoryPath>${origin.directory}/rxnorm-origin.zip</inputDirectoryPath>
                     <dataOutputPath>${project.build.directory}</dataOutputPath>
                 </configuration>
                 <executions>
@@ -46,5 +90,4 @@
             </plugin>
         </plugins>
     </build>
-
 </project>
