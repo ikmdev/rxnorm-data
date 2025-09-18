@@ -4,6 +4,12 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+    <parent>
+        <groupId>dev.ikm.build</groupId>
+        <artifactId>java-parent</artifactId>
+        <version>1.64.0</version>
+    </parent>
+
     <groupId>dev.ikm.rxnorm</groupId>
     <artifactId>rxnorm-data</artifactId>
     <version>1.0.0-SNAPSHOT</version>
@@ -27,14 +33,13 @@
         <maven-artifacts.version>1.35.0</maven-artifacts.version>
         <maven-assembly-plugin.version>3.7.1</maven-assembly-plugin.version>
         <exec-maven-plugin.version>3.4.1</exec-maven-plugin.version>
-        <maven-dependency-plugin.version>3.8.0</maven-dependency-plugin.version>
         <tinkar-core.version>1.121.0</tinkar-core.version>
         <maven-plugin-api.version>3.9.7</maven-plugin-api.version>
         <slf4j.version>2.0.17</slf4j.version>
         <tinkar-composer.version>1.8.0</tinkar-composer.version>
         <maven-plugin-annotations.version>3.13.0</maven-plugin-annotations.version>
         <eclipse-collections-api.version>11.1.0-r11</eclipse-collections-api.version>
-        <maven-plugin-plugin.version>3.13.0</maven-plugin-plugin.version>
+        <maven-plugin-plugin.version>3.15.1</maven-plugin-plugin.version>
         <maven-clean-plugin.version>3.3.1</maven-clean-plugin.version>
         <maven-antrun-plugin.version>3.1.0</maven-antrun-plugin.version>
         <build-helper-maven-plugin.version>3.6.0</build-helper-maven-plugin.version>
@@ -45,11 +50,12 @@
         <source.version>2024-04-10</source.version>
         <rxnormOwl>Pilot-Defined-RxNorm-with-SNCT-classes-${source.version}-with-custom-annotations.owl</rxnormOwl>
         <source.zip>${user.home}/Downloads/${rxnormOwl}</source.zip>
-        <starterSetLocation>${user.home}/Downloads</starterSetLocation>
         <starterSet>RxNorm Starter Export 07072025.zip</starterSet>
+<!--        <dataStoreLocation>${project.basedir}/../target</dataStoreLocation>-->
         <dataStoreLocation>${project.basedir}/../../snomed-ct-data/target</dataStoreLocation>
         <dataStore>snomedct-international</dataStore>
         <reasoner-type>ElkSnomedReasoner</reasoner-type>
+        <rxnorm-origin.version>${dataStore}-${source.version}+1.0.0-SNAPSHOT</rxnorm-origin.version>
 
         <!-- origin -->
         <packager.name>IKM Dev</packager.name>
@@ -59,6 +65,11 @@
     </properties>
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>dev.ikm.rxnorm</groupId>
+                <artifactId>rxnorm-transformation-maven-plugin</artifactId>
+                <version>${project.version}</version>
+            </dependency>
             <dependency>
                 <groupId>dev.ikm.tinkar</groupId>
                 <artifactId>entity-provider</artifactId>
@@ -185,17 +196,45 @@
                     <version>${exec-maven-plugin.version}</version>
                 </plugin>
                 <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-dependency-plugin</artifactId>
-                    <version>${maven-dependency-plugin.version}</version>
+                    <groupId>dev.ikm.rxnorm</groupId>
+                    <artifactId>rxnorm-transformation-maven-plugin</artifactId>
+                    <version>${project.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>flatten-maven-plugin</artifactId>
+                    <version>1.7.2</version>
                 </plugin>
                 <!-- Skip Staging Plugin -->
                 <plugin>
                     <groupId>org.sonatype.central</groupId>
                     <artifactId>central-publishing-maven-plugin</artifactId>
-                    <inherited>false</inherited>
+                    <configuration>
+                        <skipPublishing>false</skipPublishing>
+                    </configuration>
                 </plugin>
             </plugins>
         </pluginManagement>
+
+        <plugins>
+            <!-- Skip Enforcer Rule -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>enforce-no-bad-sections</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <!-- Don't enforce SemVer for this project -->
+                            <rulesToSkip>requireProperty</rulesToSkip>
+                            <failIfNoRules>false</failIfNoRules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
     </build>
 </project>
