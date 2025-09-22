@@ -1,42 +1,64 @@
-# rxnorm-data
+# RxNorm Pipeline
 
-### Team Ownership - Product Owner
-Data Team
+**Prerequisites**
 
-## Getting Started
-
-Follow these instructions to generate a rxnorm dataset:
+* JDK 24+
+* Maven 3.9.9+
+* Nexus Repository (optional)
+* SnomedCt Pipeline Artifact (see [snomed-ct-data repository](https://github.com/ikmdev/snomed-ct-data))
+ 
+**Clone Project and Configure Maven Settings**
 
 1. Clone the [rxnorm-data repository](https://github.com/ikmdev/rxnorm-data)
 
-```bash
-git clone [Rep URL]
-```
+   ```
+   git clone https://github.com/ikmdev/rxnorm-data.git
+   ```
 
-2. Change local directory to `rxnorm-data`
+2. Configure Maven settings.xml based on the [provided sample](https://ikmdev.atlassian.net/wiki/spaces/IKDT/pages/1036648449/Centralized+Documentation+for+Maven+Settings+File+Configuration).
 
-3. Download RxNorm File from National Library of Medicine (RxNorm-in-OWL/RxNorm Files): https://www.nlm.nih.gov/research/umls/rxnorm/index.html
+3. Change local directory to `rxnorm-data`
 
-4. Place the downloaded Pilot-Defined-RxNorm_*_.owl in your local Downloads directory.
+**Run Origin Packaging**
 
-5. Ensure the rxnorm-data/pom.xml contains the proper tags containing source filename for the downloaded files such as:
-   <source.zip>, <source.version>, <snomed.source.zip>, <starterSet>, etc.
+The following source data is required for this pipeline:
 
-6. Create a ~/Solor directory and ensure ~/Solor/generated-data does not exist or is empty.
+* Pilot-Defined-RxNorm-with-SNCT-classes-2024-04-10-with-custom-annotations.owl
 
-7. You can create a reasoned or unreasoned dataset by either including or commenting out the rxnorm-data/pom.xml <module>rxnorm-reasoner</module>
+More information can be found on National Library of Medicine (RxNorm-in-OWL/RxNorm Files): https://www.nlm.nih.gov/research/umls/rxnorm/index.html
 
-8. Enter the following command to build the dataset:
+1. Place the downloaded file in your ~/Downloads directory.
 
-```bash
-mvn clean install -U "-DMaven.build.cache.enable=false"
-```
+2. Ensure the properties defined in rxnorm-data/pom.xml are set to the correct file names:
+   - <rxnormOwl>
+   - <source.zip>
 
-9. Enter the following command to deploy the dataset:
+3. Run origin packaging and deployment.
 
-```bash
-mvn deploy -f rxnorm-export "-DdeployToNexus=true" "-Dmaven.deploy.skip=true" "-Dmaven.build.cache.enabled=false"
-```
+   To deploy origin artifact to a shared Nexus repository, run the following command, specifying the repository ID and URL in `-DaltDeploymentRepository`
+   ```
+   mvn clean deploy -f rxnorm-origin -Ptinkarbuild -DaltDeploymentRepository=tinkar-snapshot::https://nexus.tinkar.org/repository/maven-snapshots/ -Dmaven.build.cache.enabled=false
+   ```
 
-- NOTE. This repo is built on top of an unreasoned spined array DB from snomed-ct-data. Therefore, make sure you have it built before running step #8.
+   To install origin artifact to a local M2 repository, run the following command:
+   ```
+   mvn clean install -f rxnorm-origin -Ptinkarbuild,generateDataLocal -Dmaven.build.cache.enabled=false
+   ```
 
+**Run Transformation Pipeline**
+
+The transformation pipeline can be built after origin data is available in Nexus or a local M2 repository.
+
+1. Ensure the rxnorm-data/pom.xml contains the proper tags containing source filename for the downloaded files such as:
+   <source.zip>, <source.version>, <snomedct.version>, <starterSet>, etc.
+
+2. Build the pipeline with the following command:
+   ```
+   mvn clean install -U -Ptinkarbuild -Dmaven.build.cache.enabled=false
+   ```
+
+3. Deploy transformed data artifacts to Nexus, run the following command:
+   ```
+   mvn deploy -f snomed-ct-export -Ptinkarbuild -DaltDeploymentRepository=tinkar-snapshot::https://nexus.tinkar.org/repository/maven-snapshots/ -Dmaven.build.cache.enabled=false
+   ```
+   
