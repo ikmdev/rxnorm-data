@@ -35,7 +35,7 @@
                                     <classifier>reasoned-sa</classifier>
                                     <type>zip</type>
                                     <overWrite>true</overWrite>
-                                    <outputDirectory>${dataStoreLocation}/${dataStore}</outputDirectory>
+                                    <outputDirectory>${dataStoreLocation}</outputDirectory>
                                 </artifactItem>
                             </artifactItems>
                         </configuration>
