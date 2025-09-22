@@ -25,14 +25,14 @@ jobs:
       - name: Maven Settings File
         uses: whelk-io/maven-settings-xml-action@v22
         with:
-          servers: '[{"id": "tinkar-nexus-private", "username": "admin", "password": "${{secrets.EC2_NEXUS_PASSWORD}}"}]'
-          mirrors: '[{"id": "tinkar-nexus-private", "mirrorOf": "*", "url": "https://nexus.tinkarbuild.com/repository/maven-private/"}]'
+          servers: '[{"id": "tinkar-nexus", "username": "${{secrets.NEXUS_USER}}", "password": "${{secrets.NEXUS_PASSWORD}}"}]'
+          mirrors: '[{"id": "tinkar-nexus", "mirrorOf": "*", "url": "${{secrets.NEXUS_URL}}/repository/maven-public/"}]'
           repositories: '
             [
               {
-                "id": "tinkar-nexus-private",
-                "name": "tinkar-nexus-private",
-                "url": "https://nexus.tinkarbuild.com/repository/maven-private/",
+                "id": "tinkar-nexus",
+                "name": "tinkar-nexus",
+                "url": "${{secrets.NEXUS_URL}}/repository/maven-public/",
                 "releases": {
                   "enabled": "true",
                   "updatePolicy": "always",
