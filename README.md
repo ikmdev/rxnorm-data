@@ -59,6 +59,6 @@ The transformation pipeline can be built after origin data is available in Nexus
 
 3. Deploy transformed data artifacts to Nexus, run the following command:
    ```
-   mvn deploy -f snomed-ct-export -Ptinkarbuild -DaltDeploymentRepository=tinkar-snapshot::https://nexus.tinkar.org/repository/maven-snapshots/ -Dmaven.build.cache.enabled=false
+   mvn deploy -f rxnorm-export -Ptinkarbuild -DaltDeploymentRepository=tinkar-snapshot::https://nexus.tinkar.org/repository/maven-snapshots/ -Dmaven.build.cache.enabled=false
    ```
    
