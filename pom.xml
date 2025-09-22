@@ -52,9 +52,9 @@
         <source.zip>${user.home}/Downloads/${rxnormOwl}</source.zip>
         <starterSet>RxNorm Starter Export 07072025.zip</starterSet>
         <dataStoreLocation>${project.basedir}/../target</dataStoreLocation>
-        <dataStore>rxnorm</dataStore>
+        <dataStore>snomedct-international</dataStore>
         <reasoner-type>ElkSnomedReasoner</reasoner-type>
-        <rxnorm-origin.version>${dataStore}-${source.version}+1.0.0-SNAPSHOT</rxnorm-origin.version>
+        <rxnorm-origin.version>rxnorm-${source.version}+1.0.0-SNAPSHOT</rxnorm-origin.version>
         <snomedct.version>20250801T120000Z+1.0.0-SNAPSHOT</snomedct.version>
 
         <!-- origin -->
