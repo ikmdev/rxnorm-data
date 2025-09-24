@@ -51,7 +51,7 @@
         <rxnormOwl>Pilot-Defined-RxNorm-with-SNCT-classes-${source.version}-with-custom-annotations.owl</rxnormOwl>
         <source.zip>${user.home}/Downloads/${rxnormOwl}</source.zip>
         <starterSet>RxNorm Starter Export 07072025.zip</starterSet>
-        <dataStoreLocation>${project.basedir}/../target</dataStoreLocation>
+        <dataStoreLocation>${project.parent.basedir}/target</dataStoreLocation>
         <dataStore>snomedct-international</dataStore>
         <reasoner-type>ElkSnomedReasoner</reasoner-type>
         <rxnorm-origin.version>rxnorm-${source.version}+1.0.0-SNAPSHOT</rxnorm-origin.version>
