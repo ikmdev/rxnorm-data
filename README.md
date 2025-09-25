@@ -37,12 +37,12 @@ More information can be found on National Library of Medicine (RxNorm-in-OWL/RxN
 
    To deploy origin artifact to a shared Nexus repository, run the following command, specifying the repository ID and URL in `-DaltDeploymentRepository`
    ```
-   mvn clean deploy -f rxnorm-origin -Ptinkarbuild -DaltDeploymentRepository=tinkar-snapshot::https://nexus.tinkar.org/repository/maven-snapshots/ -Dmaven.build.cache.enabled=false
+   mvn clean deploy --projects rxnorm-origin --also-make -Ptinkarbuild -DaltDeploymentRepository=tinkar-snapshot::https://nexus.tinkar.org/repository/maven-snapshots/ -Dmaven.build.cache.enabled=false
    ```
 
    To install origin artifact to a local M2 repository, run the following command:
    ```
-   mvn clean install -f rxnorm-origin -Ptinkarbuild,generateDataLocal -Dmaven.build.cache.enabled=false
+   mvn clean install --projects rxnorm-origin --also-make -Ptinkarbuild,generateDataLocal -Dmaven.build.cache.enabled=false
    ```
 
 **Run Transformation Pipeline**
@@ -59,6 +59,6 @@ The transformation pipeline can be built after origin data is available in Nexus
 
 3. Deploy transformed data artifacts to Nexus, run the following command:
    ```
-   mvn deploy -f rxnorm-export -Ptinkarbuild -DaltDeploymentRepository=tinkar-snapshot::https://nexus.tinkar.org/repository/maven-snapshots/ -Dmaven.build.cache.enabled=false
+   mvn deploy --projects rxnorm-export --also-make -Ptinkarbuild -DaltDeploymentRepository=tinkar-snapshot::https://nexus.tinkar.org/repository/maven-snapshots/ -Dmaven.build.cache.enabled=false
    ```
    
