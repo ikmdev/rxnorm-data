@@ -95,6 +95,10 @@ public class RxnormUtility {
                 extractRdfsLabel(block, concept);
                 extractSubClassOf(block,concept);
 
+                // Resolve the RxCUI for identifier composition (class id for RxNorm-population
+                // classes; the source annotation is kept verbatim in getAnnotatedRxCui()).
+                concept.normalizeRxCui();
+
                 attributes.add(concept);
 
             }
@@ -135,10 +139,11 @@ public class RxnormUtility {
             data.setSnomedCtId(snomedCtMatcher.group(1));
         }
 
-        // Extract RxCUI identifier
+        // Extract RxCUI identifier (verbatim source annotation; the resolved value used for
+        // composition is set later by RxnormData.normalizeRxCui())
         Matcher rxCuiMatcher = Pattern.compile("oboInOwl:hasDbXref <[^>]+> \"RxCUI:\\s*([^\"]*)\"").matcher(block);
         if (rxCuiMatcher.find()) {
-            data.setRxCuiId(rxCuiMatcher.group(1));
+            data.setRxCuiAnnotation(rxCuiMatcher.group(1));
         }
 
         // Extract VUID identifier

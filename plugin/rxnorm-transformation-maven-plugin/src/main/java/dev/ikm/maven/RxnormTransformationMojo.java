@@ -34,6 +34,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -87,6 +88,8 @@ public class RxnormTransformationMojo extends AbstractMojo {
         File datastore = new File(datastorePath);
         this.rxnormModule = EntityProxy.Concept.make(PublicIds.of(UUID.fromString(RxnormUtility.RXNORM_MODULE)));
 
+        RxnormRunReport.reset();
+
         try {
             unzipRawData(inputDirectoryPath);
         } catch (IOException e) {
@@ -105,6 +108,7 @@ public class RxnormTransformationMojo extends AbstractMojo {
                 createConcepts(composer);
             } catch (Exception e) {
                 LOG.error("Error during data processing", e);
+                RxnormRunReport.recordError("processing: " + e);
             }
             LOG.info("Committing all sessions...");
             composer.commitAllSessions();
@@ -112,7 +116,21 @@ public class RxnormTransformationMojo extends AbstractMojo {
         } finally {
             EntityService.get().endLoadPhase();
             PrimitiveData.stop();
+            writeRunReport();
             LOG.info("########## Rxnorm Transformation Completed.");
+        }
+    }
+
+    /** Writes the per-run statistics report to the module's build directory (never fails the build). */
+    private void writeRunReport() {
+        try {
+            RxnormRunReport.writeJson(Path.of(dataOutputPath), rxnormOwl.getName(), RxnormRunReport.sha256Hex(rxnormOwl));
+            LOG.info("RxCUI from annotation: {}, RxCUI completed by rule: {}, errors: {}",
+                    RxnormRunReport.rxCuiFromAnnotation.get(),
+                    RxnormRunReport.rxCuiCompletedByRule.get(),
+                    RxnormRunReport.errorCount.get());
+        } catch (Exception e) {
+            LOG.warn("Could not write transformation run report", e);
         }
     }
 
@@ -171,16 +189,23 @@ public class RxnormTransformationMojo extends AbstractMojo {
 
             // Create concepts for each class
             for (RxnormData rxnormConcept : rxnormConcepts) {
+                RxnormRunReport.classCount.incrementAndGet();
+                // Note: RxCUI is intentionally NOT part of this label-only predicate. After
+                // RxnormData.normalizeRxCui() every RxNorm-population class has a non-empty
+                // resolved RxCUI, so including it would mis-route everything. Verified for the
+                // 2024-04-10 pilot OWL: 0 classes are RxCUI-annotation-only, so no class's
+                // route changes; if a future release introduces one, revisit this predicate.
                 if (!rxnormConcept.getRdfsLabel().isEmpty() &&
                         rxnormConcept.getRxnormName().isEmpty() &&
                         rxnormConcept.getRxnormSynonym().isEmpty() &&
                         rxnormConcept.getPrescribableSynonym().isEmpty() &&
                         rxnormConcept.getSnomedCtId().isEmpty() &&
-                        rxnormConcept.getRxCuiId().isEmpty() &&
                         rxnormConcept.getVuidId().isEmpty() &&
                         rxnormConcept.getNdcCodes().isEmpty()) {
+                    RxnormRunReport.labelOnlyConceptCount.incrementAndGet();
                     createLabelOnlyConcept(rxnormConcept, timeForStamp, composer);
                 } else {
+                    RxnormRunReport.fullConceptCount.incrementAndGet();
                     if (!rxnormConcept.getSnomedCtId().isEmpty()) {
                         createRxNormSnomedMappingConcept(rxnormConcept.getId(), rxnormConcept.getSnomedCtId(), timeForStamp, composer);
                     }
@@ -192,6 +217,7 @@ public class RxnormTransformationMojo extends AbstractMojo {
 
         } catch (Exception e) {
             LOG.error("Error processing RxNorm OWL file", e);
+            RxnormRunReport.recordError("processing: " + e);
         }
     }
 
@@ -238,6 +264,7 @@ public class RxnormTransformationMojo extends AbstractMojo {
             createPatternSemantics(session, concept, rxnormData);
         } catch (Exception e) {
             LOG.error("Error creating concept for RxNorm ID: " + rxnormId, e);
+            RxnormRunReport.recordError("concept " + rxnormId + ": " + e);
         }
     }
 
@@ -295,6 +322,7 @@ public class RxnormTransformationMojo extends AbstractMojo {
             }
         } catch (Exception e) {
             LOG.error("Error creating description semantic for concept: " + concept, e);
+            RxnormRunReport.recordError("description " + rxnormData.getId() + ": " + e);
         }
     }
 
@@ -322,19 +350,9 @@ public class RxnormTransformationMojo extends AbstractMojo {
                         ));
             }
 
-            if(!rxnormData.getRxCuiId().isEmpty()){
-                EntityProxy.Semantic semantic = EntityProxy.Semantic.make(
-                        PublicIds.of(UuidT5Generator.get(namespace, concept.publicId().asUuidArray()[0] + rxnormData.getRxCuiId() + "RXID")));
-                EntityProxy.Concept rxnormIdentifier = RxnormUtility.getRxcuidConcept();
-                session.compose((SemanticAssembler semanticAssembler) -> semanticAssembler
-                        .semantic(semantic)
-                        .pattern(IDENTIFIER_PATTERN)
-                        .reference(concept)
-                        .fieldValues(fieldValues -> fieldValues
-                                .with(rxnormIdentifier)
-                                .with(rxnormData.getRxCuiId())
-                        ));
-            }
+            // RxCUI identifier: resolved by the DTO (class id for every RxNorm-population
+            // class; divergent source annotations preserved as an additional identifier).
+            composeRxCuiIdentifiers(session, concept, rxnormData);
             if(!rxnormData.getVuidId().isEmpty()){
                 EntityProxy.Semantic semantic = EntityProxy.Semantic.make(
                         PublicIds.of(UuidT5Generator.get(namespace, concept.publicId().asUuidArray()[0] + rxnormData.getVuidId() + "VUID")));
@@ -379,7 +397,55 @@ public class RxnormTransformationMojo extends AbstractMojo {
 
         } catch (Exception e) {
             LOG.error("Error creating description semantic for concept: " + concept, e);
+            RxnormRunReport.recordError("identifier " + rxnormData.getId() + ": " + e);
         }
+    }
+
+    /**
+     * Composes the RxCUI identifier semantic(s) for a concept from the DTO's resolved RxCUI.
+     *
+     * <p>Every RxNorm-population class carries exactly one identity RxCUI — its own class id
+     * (the RxCUI is definitionally the class's integer id; {@link RxnormData#normalizeRxCui()}).
+     * If the source annotated a divergent value (a data-quality anomaly — 0 occurrences in the
+     * 2024-04-10 pilot OWL), that value is composed as an ADDITIONAL RxCUI identifier semantic
+     * so no source-provided data is dropped, and the mismatch is recorded in the run report.
+     * Non-RxNorm classes (SNOMED formal-spec shadow classes) receive no RxCUI.
+     */
+    private void composeRxCuiIdentifiers(Session session, EntityProxy.Concept concept, RxnormData rxnormData) {
+        if (rxnormData.getRxCuiId().isEmpty()) {
+            return; // non-RxNorm class (e.g. SNOMED formal-spec shadow) — no RxCUI
+        }
+        composeRxCuiIdentifier(session, concept, rxnormData.getRxCuiId());
+        if (rxnormData.isRxCuiAnnotated()) {
+            RxnormRunReport.rxCuiFromAnnotation.incrementAndGet();
+        } else {
+            RxnormRunReport.rxCuiCompletedByRule.incrementAndGet();
+        }
+        if (rxnormData.isRxCuiMismatch()) {
+            composeRxCuiIdentifier(session, concept, rxnormData.getAnnotatedRxCui());
+            RxnormRunReport.recordRxCuiMismatch(rxnormData.getId(), rxnormData.getAnnotatedRxCui());
+        }
+    }
+
+    /**
+     * Composes a single RxCUI identifier semantic for a concept with the given value.
+     *
+     * <p>Deterministic public id: {@code T5(namespace, conceptUuid + rxCuiValue + "RXID")} —
+     * the formula the pipeline has always used for annotated classes, so composing it for
+     * unannotated classes (value = class id) is purely additive for them.
+     */
+    private void composeRxCuiIdentifier(Session session, EntityProxy.Concept concept, String rxCuiValue) {
+        EntityProxy.Semantic semantic = EntityProxy.Semantic.make(
+                PublicIds.of(UuidT5Generator.get(namespace, concept.publicId().asUuidArray()[0] + rxCuiValue + "RXID")));
+        EntityProxy.Concept rxnormIdentifier = RxnormUtility.getRxcuidConcept();
+        session.compose((SemanticAssembler semanticAssembler) -> semanticAssembler
+                .semantic(semantic)
+                .pattern(IDENTIFIER_PATTERN)
+                .reference(concept)
+                .fieldValues(fieldValues -> fieldValues
+                        .with(rxnormIdentifier)
+                        .with(rxCuiValue)
+                ));
     }
 
     /**
@@ -395,6 +461,7 @@ public class RxnormTransformationMojo extends AbstractMojo {
                     concept);
         } catch (Exception e) {
             LOG.error("Error creating state definition semantic for concept: " + concept, e);
+            RxnormRunReport.recordError("axiom " + rxnormData.getId() + ": " + e);
         }
     }
 
@@ -470,6 +537,7 @@ public class RxnormTransformationMojo extends AbstractMojo {
              createTallmanSynonymPattern(session, concept, rxnormData);
         } catch (Exception e) {
             LOG.error("Error creating pattern semantic for concept: " + concept, e);
+            RxnormRunReport.recordError("pattern " + rxnormData.getId() + ": " + e);
         }
     }
 
@@ -530,6 +598,11 @@ public class RxnormTransformationMojo extends AbstractMojo {
             // Create description using rdfs:label as FQN
             createLabelDescription(session, concept, rxnormData);
 
+            // RxCUI identifier: resolved by the DTO (class id for RxNorm-population classes;
+            // none for SNOMED formal-spec shadow classes; divergent annotations preserved as
+            // an additional identifier).
+            composeRxCuiIdentifiers(session, concept, rxnormData);
+
             // Create axiom semantic - prefer EquivalentClasses over SubClassOf
             if (!rxnormData.getEquivalentClassesStr().isEmpty()) {
                 createStatedDefinitionSemantics(session, concept, rxnormData);
@@ -539,6 +612,7 @@ public class RxnormTransformationMojo extends AbstractMojo {
 
         } catch (Exception e) {
             LOG.error("Error creating label-only concept for RxNorm ID: " + rxnormId, e);
+            RxnormRunReport.recordError("label-only " + rxnormId + ": " + e);
         }
     }
 

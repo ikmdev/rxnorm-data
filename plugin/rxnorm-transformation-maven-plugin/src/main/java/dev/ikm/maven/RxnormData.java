@@ -6,6 +6,9 @@ import java.util.List;
 import java.util.Map;
 
 public class RxnormData {
+    /** URI prefix of RxNorm vocabulary classes (their integer suffix is the RxCUI). */
+    public static final String RXNORM_URI_PREFIX = "http://mor.nlm.nih.gov/RXNORM/";
+
     private String id;
     private String uri;
 
@@ -14,7 +17,15 @@ public class RxnormData {
     private String prescribableSynonym = "";
 
     private String snomedCtId = "";
+    /**
+     * Resolved RxCUI for identifier composition. Populated by {@link #normalizeRxCui()} after
+     * extraction: the class id for every RxNorm-population class (a class's RxCUI is
+     * definitionally its own integer id), "" for non-RxNorm classes (e.g. SNOMED formal-spec
+     * shadow classes, which receive no RxCUI).
+     */
     private String rxCuiId = "";
+    /** RxCUI value as annotated in the OWL source ("" when absent) — kept verbatim for fidelity. */
+    private String rxCuiAnnotation = "";
     private String vuidId = "";
     private List<String> ndcCodes = new ArrayList<>();
     private Map<String, String> ndcCodesWithEndDates = new HashMap<>();
@@ -31,8 +42,8 @@ public class RxnormData {
 
     public RxnormData(String uri) {
         this.uri = uri;
-        if (uri.startsWith("http://mor.nlm.nih.gov/RXNORM/")) {
-            this.id = uri.substring("http://mor.nlm.nih.gov/RXNORM/".length());
+        if (uri.startsWith(RXNORM_URI_PREFIX)) {
+            this.id = uri.substring(RXNORM_URI_PREFIX.length());
         } else {
             this.id = uri.substring("http://snomed.info/id/".length());
         }
@@ -60,6 +71,51 @@ public class RxnormData {
 
     public void setRxCuiId(String rxCuiId) {
         this.rxCuiId = rxCuiId;
+    }
+
+    /** RxCUI value exactly as annotated in the OWL source ("" when the source carries none). */
+    public String getAnnotatedRxCui() {
+        return rxCuiAnnotation;
+    }
+
+    void setRxCuiAnnotation(String rxCuiAnnotation) {
+        this.rxCuiAnnotation = rxCuiAnnotation == null ? "" : rxCuiAnnotation;
+    }
+
+    /** True when the OWL source carried a RxCUI annotation for this class. */
+    public boolean isRxCuiAnnotated() {
+        return !rxCuiAnnotation.isEmpty();
+    }
+
+    /**
+     * True when the source annotated a RxCUI that differs from the class's own id — a
+     * data-quality anomaly (a class's RxCUI is definitionally its own id). Verified: 0 of the
+     * 17,230 annotated classes in the 2024-04-10 pilot OWL. The annotated value is still
+     * composed as an additional identifier by the pipeline so no source data is dropped.
+     */
+    public boolean isRxCuiMismatch() {
+        return isRxCuiAnnotated() && !rxCuiAnnotation.equals(rxCuiId);
+    }
+
+    /** True when the class belongs to the RxNorm population (vs a SNOMED shadow class). */
+    public boolean isRxnormClass() {
+        return uri != null && uri.startsWith(RXNORM_URI_PREFIX);
+    }
+
+    /**
+     * Resolves this class's RxCUI for identifier composition; call once after extraction.
+     *
+     * <p>An RxNorm class's RxCUI is definitionally the integer id of the class itself (the RxCUI
+     * embedded in the class URI), so for RxNorm-population classes the resolved value is the
+     * class id, independent of the annotation. The annotation is corroboration, not identity:
+     * for 100% of annotated classes it equals the class id, and a divergent annotation (see
+     * {@link #isRxCuiMismatch()}) must never override the identity. Non-RxNorm classes (e.g.
+     * SNOMED formal-spec shadow classes, whose ids end in "-FS") receive no RxCUI.
+     */
+    public void normalizeRxCui() {
+        if (isRxnormClass() && id != null && !id.isEmpty()) {
+            this.rxCuiId = id;
+        }
     }
 
     public void setVuidId(String vuidId) {
@@ -131,6 +187,10 @@ public class RxnormData {
         return snomedCtId;
     }
 
+    /**
+     * Resolved RxCUI for identifier composition — populated by {@link #normalizeRxCui()}:
+     * the class id for every RxNorm-population class, "" for non-RxNorm classes.
+     */
     public String getRxCuiId() {
         return rxCuiId;
     }
@@ -181,7 +241,8 @@ public class RxnormData {
 
     @Override
     public String toString() {
-        return this.id +" - "+ this.uri +" - "+ this.rxnormName +" - "+ this.snomedCtId +" - "+ this.rxCuiId +" - "+ this.vuidId;
+        return this.id +" - "+ this.uri +" - "+ this.rxnormName +" - "+ this.snomedCtId +" - "+ this.rxCuiId
+                + (isRxCuiMismatch() ? " (annotatedRxCui=" + rxCuiAnnotation + ")" : "") +" - "+ this.vuidId;
     }
 
 }
